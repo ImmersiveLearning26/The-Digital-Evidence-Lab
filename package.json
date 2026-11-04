@@ -1,0 +1,19 @@
+{
+  "name": "digital-evidence-lab",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "node tests/browser-e2e.mjs && node tests/browser-extra.mjs && node tests/browser-firsttime.mjs",
+    "vendor:three": "node scripts/vendor-three.mjs",
+    "media": "python3 scripts/build_evidence.py && node scripts/build-voice.mjs"
+  },
+  "dependencies": {
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "playwright": "1.64.1"
+  }
+}

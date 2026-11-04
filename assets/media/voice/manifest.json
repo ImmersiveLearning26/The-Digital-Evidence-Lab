@@ -1,0 +1,282 @@
+{
+ "voice": "Yna Agalo (ElevenLabs, eleven_v3)",
+ "final": true,
+ "calls": {
+  "briefing": {
+   "hello": {
+    "file": "assets/media/voice/source/briefing-hello.mp3",
+    "duration": 7.55,
+    "cues": [
+     {
+      "start": 0,
+      "end": 3.736,
+      "text": "Hey! Oh good, you made it. Can you hear me okay?"
+     },
+     {
+      "start": 3.736,
+      "end": 7.55,
+      "text": "Okay, great. So, how's your morning going so far?"
+     }
+    ]
+   },
+   "good": {
+    "file": "assets/media/voice/source/briefing-good.mp3",
+    "duration": 3.32,
+    "cues": [
+     {
+      "start": 0,
+      "end": 3.32,
+      "text": "Ah, nice, love to hear it."
+     }
+    ]
+   },
+   "nervous": {
+    "file": "assets/media/voice/source/briefing-nervous.mp3",
+    "duration": 5.72,
+    "cues": [
+     {
+      "start": 0,
+      "end": 5.72,
+      "text": "Oh, don't worry, everybody is on their first day. You're going to be fine, I promise."
+     }
+    ]
+   },
+   "who": {
+    "file": "assets/media/voice/source/briefing-who.mp3",
+    "duration": 13.32,
+    "cues": [
+     {
+      "start": 0,
+      "end": 5.657,
+      "text": "So, I'm Amina. I'm the senior analyst here, and you're our new junior engineer."
+     },
+     {
+      "start": 5.657,
+      "end": 9.023,
+      "text": "So you'll be working with me on this one, okay?"
+     },
+     {
+      "start": 9.023,
+      "end": 13.32,
+      "text": "It's case 0417, and we think it's a mobile-money fraud ring."
+     }
+    ]
+   },
+   "items": {
+    "file": "assets/media/voice/source/briefing-items.mp3",
+    "duration": 26.67,
+    "cues": [
+     {
+      "start": 0,
+      "end": 3.744,
+      "text": "Now, three things landed on my desk this morning."
+     },
+     {
+      "start": 3.744,
+      "end": 10.775,
+      "text": "A text message, a photograph and, you won't believe this, an actual audio recording on tape."
+     },
+     {
+      "start": 10.775,
+      "end": 18.493,
+      "text": "So our job is to get all three digitised, processed and stored, without losing anything that matters."
+     },
+     {
+      "start": 18.493,
+      "end": 24.53,
+      "text": "And we've only got a limited amount of storage, so we have to be a bit careful."
+     },
+     {
+      "start": 24.53,
+      "end": 26.67,
+      "text": "Does that make sense so far?"
+     }
+    ]
+   },
+   "clear": {
+    "file": "assets/media/voice/source/briefing-clear.mp3",
+    "duration": 1.57,
+    "cues": [
+     {
+      "start": 0,
+      "end": 1.57,
+      "text": "Perfect."
+     }
+    ]
+   },
+   "again": {
+    "file": "assets/media/voice/source/briefing-again.mp3",
+    "duration": 8.36,
+    "cues": [
+     {
+      "start": 0,
+      "end": 2.286,
+      "text": "Of course, no problem. Three items."
+     },
+     {
+      "start": 2.286,
+      "end": 8.36,
+      "text": "Keep everything that matters, and make it all fit in the storage we've got. That's really it."
+     }
+    ]
+   },
+   "plan": {
+    "file": "assets/media/voice/source/briefing-plan.mp3",
+    "duration": 20.61,
+    "cues": [
+     {
+      "start": 0,
+      "end": 7.655,
+      "text": "So here's the plan. We'll prepare the evidence, then you'll do the text, then the image, then the sound."
+     },
+     {
+      "start": 7.655,
+      "end": 10.747,
+      "text": "And at the end you hand it all over to me."
+     },
+     {
+      "start": 10.747,
+      "end": 17.077,
+      "text": "I'll be scoring how you handle the evidence, and your text, image and audio decisions."
+     },
+     {
+      "start": 17.077,
+      "end": 20.61,
+      "text": "Not your speed, okay? So please, take your time."
+     }
+    ]
+   },
+   "rule": {
+    "file": "assets/media/voice/source/briefing-rule.mp3",
+    "duration": 7.47,
+    "cues": [
+     {
+      "start": 0,
+      "end": 2.824,
+      "text": "Oh, and one rule before you go."
+     },
+     {
+      "start": 2.824,
+      "end": 7.47,
+      "text": "We always work on copies. Never the original. Yeah?"
+     }
+    ]
+   },
+   "tape": {
+    "file": "assets/media/voice/source/briefing-tape.mp3",
+    "duration": 9.95,
+    "cues": [
+     {
+      "start": 0,
+      "end": 4.946,
+      "text": "The tape is actually the most fragile one, but the deck is booked for this afternoon."
+     },
+     {
+      "start": 4.946,
+      "end": 9.95,
+      "text": "So we'll start with the text and the photo, and the tape just stays sealed until then."
+     }
+    ]
+   },
+   "bye": {
+    "file": "assets/media/voice/source/briefing-bye.mp3",
+    "duration": 8.12,
+    "cues": [
+     {
+      "start": 0,
+      "end": 5.049,
+      "text": "Alright, that's it from me. I'm sending you the intake record in Chat now."
+     },
+     {
+      "start": 5.049,
+      "end": 8.12,
+      "text": "Message me if you get stuck, okay? Talk soon!"
+     }
+    ]
+   }
+  },
+  "closing": {
+   "hey": {
+    "file": "assets/media/voice/source/closing-hey.mp3",
+    "duration": 4.52,
+    "cues": [
+     {
+      "start": 0,
+      "end": 4.52,
+      "text": "Hey, you! So that's the handover in. How are you feeling?"
+     }
+    ]
+   },
+   "fine": {
+    "file": "assets/media/voice/source/closing-fine.mp3",
+    "duration": 2.85,
+    "cues": [
+     {
+      "start": 0,
+      "end": 2.85,
+      "text": "Good, you should. You did really well."
+     }
+    ]
+   },
+   "hard": {
+    "file": "assets/media/voice/source/closing-hard.mp3",
+    "duration": 5.56,
+    "cues": [
+     {
+      "start": 0,
+      "end": 5.56,
+      "text": "Yeah, it's meant to be. But you got through it, and that's what counts."
+     }
+    ]
+   },
+   "review": {
+    "file": "assets/media/voice/source/closing-review.mp3",
+    "duration": 11.08,
+    "cues": [
+     {
+      "start": 0,
+      "end": 4.163,
+      "text": "So let's look back at your decisions. It's all in your record."
+     },
+     {
+      "start": 4.163,
+      "end": 11.08,
+      "text": "If you open each card you'll see what you chose, what happened, and what the strongest path looks like."
+     }
+    ]
+   },
+   "wins": {
+    "file": "assets/media/voice/source/closing-wins.mp3",
+    "duration": 12.28,
+    "cues": [
+     {
+      "start": 0,
+      "end": 6.918,
+      "text": "But honestly? Text intact, plate legible, buzzer preserved, originals untouched."
+     },
+     {
+      "start": 6.918,
+      "end": 12.28,
+      "text": "And all of it inside the allocation. That's a good day's work."
+     }
+    ]
+   },
+   "bye": {
+    "file": "assets/media/voice/source/closing-bye.mp3",
+    "duration": 12.12,
+    "cues": [
+     {
+      "start": 0,
+      "end": 7.093,
+      "text": "And notice what we did. We never added anything, and we never threw away anything we couldn't get back."
+     },
+     {
+      "start": 7.093,
+      "end": 12.12,
+      "text": "That's really the whole job. Good work, okay? I'll see you in the record."
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,95 @@
+{
+  "enable3D": true,
+  "modelUrl": "assets/models/workstation.glb",
+  "units": "metres",
+  "screenMesh": "Monitor_Screen",
+  "cameras": {
+    "overview": "Camera_Overview",
+    "monitor": "Camera_Monitor",
+    "drive": "Camera_Drive",
+    "tape": "Camera_Tape"
+  },
+  "hotspots": {
+    "Power_Button": "power",
+    "WriteBlocker_Switch": "blocker",
+    "EvidenceDrive": "drive",
+    "Microcassette": "tape",
+    "AudioInterface": "interface",
+    "Headphones": "headphones",
+    "Plug_BlockerIn": "drive",
+    "Plug_InterfaceIn": "interface",
+    "Monitor_Body": "use"
+  },
+  "clips": {
+    "power": "Power_Press",
+    "blocker": "Blocker_Enable",
+    "drive": "Drive_Connect",
+    "tape": "Tape_Insert",
+    "interface": "Interface_Connect",
+    "headphones": "Headphones_Lift"
+  },
+  "screenCorners": [
+    "Screen_TL",
+    "Screen_TR",
+    "Screen_BR",
+    "Screen_BL"
+  ],
+  "stations": {
+    "power": "overview",
+    "blocker": "drive",
+    "drive": "drive",
+    "tape": "tape",
+    "interface": "tape",
+    "headphones": "tape"
+  },
+  "pointers": {
+    "power": "Hit_Power_Button",
+    "blocker": "Hit_WriteBlocker_Switch",
+    "drive": "Plug_BlockerIn",
+    "tape": "Hit_Microcassette",
+    "interface": "Plug_InterfaceIn",
+    "headphones": "Hit_Headphones"
+  },
+  "parts": {
+    "monitor": [
+      "Monitor_Body"
+    ],
+    "tower": [
+      "PC_Tower"
+    ],
+    "blocker": [
+      "WriteBlocker"
+    ],
+    "drive": [
+      "EvidenceDrive"
+    ],
+    "recorder": [
+      "TapePlayer"
+    ],
+    "tape": [
+      "Microcassette"
+    ],
+    "interface": [
+      "AudioInterface"
+    ],
+    "headphones": [
+      "HeadphoneSet"
+    ],
+    "keyboard": [
+      "Keyboard",
+      "Mouse"
+    ]
+  },
+  "partAliases": {
+    "Power_Button": "tower",
+    "WriteBlocker_Switch": "blocker",
+    "Plug_BlockerIn": "drive",
+    "Plug_InterfaceIn": "interface",
+    "Headphones": "headphones"
+  },
+  "routes": {
+    "drive": "Cable_Drive",
+    "interface": "Cable_Audio",
+    "headphones": "Cable_Headphone"
+  }
+}
