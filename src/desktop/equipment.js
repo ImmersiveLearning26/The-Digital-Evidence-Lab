@@ -61,7 +61,8 @@ function view() {
     const group = STATION[part], count = group.length > 1 ? `Step ${group.indexOf(part) + 1} of ${group.length}` : '';
     body = `<div class="eq-say">${count ? `<small>${count}</small>` : ''}<p>${esc(STEPS[part].label)}</p></div><button class="btn primary big" data-action="eq:do" data-part="${part}" ${busy ? 'disabled' : ''}>Do this</button>${s.powered ? '<button class="eq-back" data-action="eq:use">Back to the computer</button>' : ''}`;
   }
-  return `${stage}<div class="eq-bar">${body}</div>`;
+  const watch = app.ui.stuck?.startsWith('bench:') ? '<button class="eq-back" data-action="demo:watch">Watch how</button>' : '';
+  return `${stage}<div class="eq-bar">${body}${watch}</div>`;
 }
 
 export const renderEquipment = () => {

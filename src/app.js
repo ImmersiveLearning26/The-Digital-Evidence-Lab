@@ -6,7 +6,7 @@ import {addToast, cycleWindows, flushToasts, launch, renderShell} from './deskto
 import {dialogOpen, message} from './desktop/modal.js';
 import {wireWindows} from './desktop/wm.js';
 import {wireContext} from './desktop/context.js';
-import {startGuide} from './desktop/guide.js';
+import {noteRefusal, startGuide} from './desktop/guide.js';
 import {initBench, renderEquipment, stationFor} from './desktop/equipment.js';
 import {devPanel} from './desktop/dev.js';
 import './apps/browser.js';
@@ -28,6 +28,7 @@ const restored = app.load();
 const FREE_WHEN_PAUSED = new Set(['pause:resume', 'dev:toggle', 'dev:pause', 'dev:reset', 'dev:screen']);
 
 app.onGuide = async text => {
+  noteRefusal();
   const atDesk = app.ui.mode === 'desktop' && /write-blocker first|at the bench/.test(text);
   const go = await message({title: 'Case guidance', text, buttons: atDesk ? [['Go to my bench', true], ['Close', false]] : [['OK', true]]});
   if (atDesk && go) app.setMode('equipment');

@@ -189,6 +189,27 @@ section('gimp reload');
   await p.context().close();
 }
 
+section('watch how');
+// A learner who is really stuck, here refused twice, is offered a short vector demo of the step.
+{
+  const p = await open();
+  await toStage(p, 'image');
+  ok(!(await p.locator('.tip-watch').count()), 'No demo is offered before the learner is stuck');
+  for (let i = 0; i < 2; i++) {
+    await p.evaluate(() => window.__app.guide('Open the working photograph in GIMP first.'));
+    await p.locator('.modal.cd .btn').first().click();
+  }
+  await p.locator('.tip-watch').waitFor({timeout: 5000});
+  ok(true, 'Two refused attempts offer Watch how it’s done');
+  await p.locator('.tip-watch').click();
+  await p.locator('.modal.demo .dm-stage').waitFor();
+  await p.waitForFunction(() => [...document.querySelectorAll('.dm-stage text')].some(t => t.textContent === 'GIMP'), null, {timeout: 8000});
+  ok(true, 'The demo opens and draws the step in GIMP');
+  await p.locator('.modal.demo [data-m="close"]').click();
+  ok(!(await p.locator('.modal.demo').count()), 'Got it closes the demo');
+  await p.context().close();
+}
+
 clearTimeout(watchdog);
 await browser.close();
 if (errors.length) { console.error(errors); process.exit(1); }

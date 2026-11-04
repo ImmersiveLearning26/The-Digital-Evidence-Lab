@@ -7,6 +7,8 @@ import {app} from '../runtime.js';
 import {nextTask} from '../core/state.js';
 import {win} from './wm.js';
 import {WITNESS_PATH, IMAGE_MASTER_PATH} from '../core/domain.js';
+import {nextStep} from './equipment.js';
+import {hasDemo, watchDemo} from './demo.js';
 
 const WAITS = [8000, 15000, 25000, 40000];
 const fileName = path => path.split('\\').pop();
@@ -184,6 +186,7 @@ function follow() {
   frame = requestAnimationFrame(follow);
 }
 function show(el) {
+  if (!forced) glowed = true;
   current = el;
   glow().hidden = false;
   cancelAnimationFrame(frame);
@@ -195,10 +198,44 @@ function hide() {
   glow().hidden = true;
   cancelAnimationFrame(frame);
 }
+// ---- Really stuck: long on one task after the glow has already shown, two refused attempts, or still
+// stuck a while after "Show me". Only then is the demo offered; nobody is shown it early.
+const STUCK = {desk: 75000, bench: 45000, afterShowMe: 20000};
+let stuckKey = null, stuckSince = 0, refusals = 0, glowed = false, forcedAt = 0;
+const taskKey = () => (app.ui.mode === 'equipment' ? `bench:${nextStep(app.s)}` : nextTask(app.s).id);
+// A new task starts the count again. A refusal counts against the task it was made on, at once.
+function followTask() {
+  const key = taskKey();
+  if (key === stuckKey) return false;
+  stuckKey = key;
+  stuckSince = app.clock.time;
+  refusals = 0;
+  glowed = false;
+  forcedAt = 0;
+  if (app.ui.stuck) { app.ui.stuck = null; app.render(); }
+  return true;
+}
+export function noteRefusal() { followTask(); refusals++; }
+function watchStuck() {
+  if (app.ui.mode === 'opening' || app.ui.mode === 'desktop' && quietNow()) { stuckSince = app.clock.time; return; }
+  if (followTask()) return;
+  const key = stuckKey, now = app.clock.time;
+  if (app.ui.stuck === key || !hasDemo(key)) return;
+  const bench = key.startsWith('bench:'), long = now - stuckSince;
+  if ((bench ? long > STUCK.bench : long > STUCK.desk && glowed) || refusals >= 2 || (forcedAt && now - forcedAt > STUCK.afterShowMe)) {
+    app.ui.stuck = key;
+    if (!bench) Object.assign(app.ui.tips, {hidden: false, unread: 1});
+    app.render();
+  }
+}
+app.watchDemo = key => watchDemo(key ?? app.ui.stuck ?? taskKey());
+app.register({'demo:watch': () => app.watchDemo()});
+
 const quietNow = () => app.ui.mode !== 'desktop' || !app.s.name || app.busyAudio || app.ui.meet.phase === 'incall' && app.ui.browser.active === 'meet';
 
 function tick() {
   app.clock.after(400, tick);
+  watchStuck();
   if (quietNow()) { if (current && !forced) hide(); return; }
   const found = target();
   dodge(found?.el);
@@ -218,6 +255,7 @@ export function showMe() {
   const found = target();
   if (!found?.el) return;
   forced = true;
+  forcedAt = app.clock.time;
   app.ui.tips.open = false;
   app.render();
   requestAnimationFrame(() => { const again = target(); if (again?.el) show(reveal(again)); });

@@ -48,7 +48,7 @@ for (; clicks < 260; ) {
   if (await page.locator('.meet-reply').count()) { await page.locator('.meet-reply').first().click(); await page.waitForTimeout(600); continue; }
   // The call may end on its own between seeing Skip and pressing it.
   if (await page.locator('[data-action="meet:skip"]').count() && busy) { await page.locator('[data-action="meet:skip"]').click({timeout: 2000}).catch(() => {}); continue; }
-  if (await page.locator('[data-action="meet:back"]').count()) { await page.locator('[data-action="meet:back"]').click(); continue; }
+  if (await page.locator('[data-action="meet:back"]').count()) { await page.locator('[data-action="meet:back"]').click({timeout: 2000}).catch(() => {}); continue; }
   if (busy) { await page.waitForTimeout(400); continue; }
   if (await page.locator('.modal[aria-label="Drive/Image Verify Results"]').count()) { await page.locator('.modal[aria-label="Drive/Image Verify Results"] .btn').click(); continue; }
   if (await page.locator('.modal[aria-label="Case guidance"]').count()) { console.log('  guidance dialog:', (await page.locator('.modal[aria-label="Case guidance"]').textContent()).slice(0, 90)); await page.locator('.modal[aria-label="Case guidance"] .btn').last().click(); continue; }

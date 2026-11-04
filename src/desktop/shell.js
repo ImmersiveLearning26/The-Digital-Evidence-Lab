@@ -112,10 +112,11 @@ function tips() {
   return t;
 }
 const bulb = '<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3a10 10 0 0 0-6 18c1.300 1 2 2.300 2 4h8c0-1.700.7-3 2-4a10 10 0 0 0-6-18z" fill="#ffc21a"/><path d="M12.500 27.500h7M14 30h4" stroke="#6b5a1f" stroke-width="2" stroke-linecap="round"/></svg>';
+const play = '<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M6.5 5.5v5l4-2.5z" fill="currentColor"/></svg>';
 function tipCard() {
   const t = tips();
   if (t.hidden || !t.key) return '';
-  return `<aside class="tip ${t.open ? 'open' : ''}" data-key="tip" aria-label="Amina's tips"><header>${bulb}<strong>Amina's tips</strong>${t.unread ? `<b class="tip-count" aria-label="${t.unread} new">${t.unread}</b>` : ''}<button data-action="tip:hide" aria-label="Hide tips"><i class="g-x"></i></button></header><p class="tip-text">${esc(t.key)}</p>${t.open ? `<p class="tip-how">${esc(t.how)}</p><button class="btn primary" data-action="tip:show-me">Show me</button>` : `<button class="tip-more" data-action="tip:open">Show me how</button>`}</aside>`;
+  return `<aside class="tip ${t.open ? 'open' : ''}" data-key="tip" aria-label="Amina's tips"><header>${bulb}<strong>Amina's tips</strong>${t.unread ? `<b class="tip-count" aria-label="${t.unread} new">${t.unread}</b>` : ''}<button data-action="tip:hide" aria-label="Hide tips"><i class="g-x"></i></button></header><p class="tip-text">${esc(t.key)}</p>${t.open ? `<p class="tip-how">${esc(t.how)}</p><button class="btn primary" data-action="tip:show-me">Show me</button>` : `<button class="tip-more" data-action="tip:open">Show me how</button>`}${app.ui.stuck && !app.ui.stuck.startsWith('bench:') ? `<button class="btn tip-watch" data-action="demo:watch">${play}<span>Watch how it’s done</span></button>` : ''}</aside>`;
 }
 
 const q = id => document.getElementById(id);

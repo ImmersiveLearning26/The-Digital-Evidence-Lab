@@ -356,3 +356,34 @@ svg{display:block}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 @media (max-width:1180px){.tb-search{display:none}}
 @media (max-width:1000px){.tray-btn.equip span{display:none}}
+
+/* ---- Watch how it's done: a vector demo, outlines and labels only. */
+.modal.demo .modal-body{padding:24px}
+.dm-stage{display:block;width:100%;height:auto;background:#10182f;border-radius:6px}
+.dm-line{fill:none;stroke:rgba(214,226,255,.7);stroke-width:1.2}
+.dm-faint{stroke:rgba(214,226,255,.28)}
+.dm-frame{stroke:rgba(214,226,255,.85)}
+.dm-panel{fill:#16203f}
+.dm-bar{fill:#141c38;stroke:rgba(214,226,255,.35)}
+.dm-primary{stroke:#60cdff}
+.dm-hit{stroke:#ffc84a!important;stroke-width:1.8}
+.dm-draw{stroke-dasharray:1;stroke-dashoffset:1;animation:dm-draw .55s cubic-bezier(.3,.7,.2,1) forwards}
+@keyframes dm-draw{to{stroke-dashoffset:0}}
+.dm-text,.dm-title,.dm-small{fill:#e3eaff;font:12px var(--ui);opacity:0;animation:dm-fade .35s .2s forwards}
+.dm-title{font-weight:600}
+.dm-small{font-size:10px;font-weight:700;letter-spacing:.12em;fill:rgba(214,226,255,.6)}
+.dm-dim{fill:rgba(214,226,255,.5)}
+@keyframes dm-fade{to{opacity:1}}
+.dm-cursor{fill:#fff;stroke:#0a0f24;stroke-width:1.2;transition:transform .6s cubic-bezier(.3,.7,.2,1);filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.dm-ring{fill:none;stroke:#ffc84a;stroke-width:2;animation:dm-ring .3s ease-out forwards}
+@keyframes dm-ring{to{r:16;opacity:0}}
+.dm-cable{fill:none;stroke:#37e3d2;stroke-width:2}
+.dm-tick{fill:none;stroke:#ffc84a;stroke-width:2}
+.dm-led{fill:#37e3d2}
+.dm-say{display:flex;align-items:center;gap:10px;margin:14px 0 0;min-height:24px;font-size:14px}
+.dm-say b{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;flex:none;border-radius:50%;background:var(--accent);color:#fff;font-size:12px}
+.tip-watch{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:10px}
+.tip-watch svg{width:16px;height:16px}
+/* With motion reduced, every step is drawn whole. */
+@media (prefers-reduced-motion:reduce){.dm-draw{stroke-dashoffset:0!important}.dm-text,.dm-title,.dm-small{opacity:1!important}}
+.reduce-motion .dm-draw{animation:none;stroke-dashoffset:0}.reduce-motion .dm-text,.reduce-motion .dm-title,.reduce-motion .dm-small{animation:none;opacity:1}
