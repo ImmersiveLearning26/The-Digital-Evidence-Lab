@@ -6,6 +6,7 @@ import {esc} from '../desktop/dom.js';
 import {icons} from '../desktop/icons.js';
 import {picture} from '../content/media.js';
 import {registerPage} from './browser.js';
+import {closeWindow} from '../desktop/wm.js';
 import {CALLS} from '../content/calls.js';
 import {CASE_ID} from '../core/domain.js';
 
@@ -168,7 +169,7 @@ function ended() {
 registerPage({
   id: 'meet', title: 'Meet', icon: icons.meet,
   tabTitle: () => `Meet – ${call().title}`,
-  url: () => `https://meet.google.com/${call().code}`,
+  url: () => `https://call.evidencelab.example/${call().code}`,
   onOpen({call: id}) {
     if (id && id !== m().call) { hangUp(); Object.assign(m(), {call: id, phase: 'prejoin', said: [], line: null}); }
     m().call ??= 'briefing';
@@ -192,7 +193,14 @@ registerPage({
     'meet:skip': () => finish(true),
     'meet:leave': () => { hangUp(); m().phase = 'prejoin'; app.status('browser', 'You left before the end. Your invitation still works.'); app.render(); },
     'meet:transcript': () => { m().transcript = !m().transcript; app.render(); },
-    'meet:back': () => app.openPage('chat'),
+    // Leaving the call closes its page; the conversation carries on in the chat panel.
+    'meet:back': () => {
+      const b = app.ui.browser;
+      b.tabs = b.tabs.filter(t => t !== 'meet');
+      if (b.active === 'meet') b.active = b.tabs.at(-1) ?? null;
+      if (!b.active) closeWindow('browser');
+      app.openDock();
+    },
   },
 });
 app.skipMedia = () => { if (m().phase === 'incall') finish(true); };

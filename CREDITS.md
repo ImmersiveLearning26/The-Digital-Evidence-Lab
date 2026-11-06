@@ -11,7 +11,7 @@ The workstation combines these Sketchfab models. CC-BY models require this attri
 | Office Table | Agha.Najam | CC-BY-4.0 | https://sketchfab.com/3d-models/office-table-80130830a9814e9298f11920ad0b7275 |
 | Very Low-Poly External Hard Drive (28 faces) | 3DHaupt | CC-BY-NC-ND-4.0 | https://sketchfab.com/3d-models/very-low-poly-external-hard-drive-28-faces-bf4db930907a4f03849bf17dc1aae |
 
-Changes made: models scaled, arranged and combined; textures reduced; the hard drive's label replaced with a case label; the recorder's cassette separated and spare cassettes and cases removed.
+Changes made: models scaled, arranged and combined; textures reduced; the hard drive's label replaced with a case label; the recorder's cassette separated and spare cassettes and cases removed; maker names and logos painted out of the recorder, audio interface and headphone textures, the headphones' raised model-name letters removed, the cassette's label replaced with a plain evidence label, and the headphones' own coiled cord removed.
 
 The hard drive's licence does not permit commercial use or changed versions. It is used at the project owner's direction.
 
@@ -26,3 +26,9 @@ Modelled for this project: write-blocker, all cables and plugs, and the tower's 
 | `assets/media/source/amina_generated.jpg` | GPT Image 2.5 (OpenAI), through Higgsfield | 2026-11-04 | Amina Njoroge's portrait, cropped to `assets/media/doc/amina_avatar.jpg` (calls) and `amina_face.jpg` (chat). An invented person. |
 
 Prompt: a CCTV still from a pole-mounted street camera on a Nairobi road on a clear morning; a plain silver saloon seen from behind with a blank yellow plate; no text, badges, people or other vehicles nearby. Check the image provider's terms before public release.
+
+# Voices
+
+Amina's calls: ElevenLabs voice Yna Agalo. The learner's inner voice: ElevenLabs voice Olamide. Both generated with `eleven_v3`. Check ElevenLabs' terms for each voice before public release.
+
+The desktop wallpaper is drawn in code for this project. The tape photograph comes from the storyboard reference, with its maker's name replaced.

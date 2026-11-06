@@ -158,7 +158,7 @@ async function attempt(part) {
   busy = false;
   app.audio.click();
   app.dispatch(evt);
-  const device = {drive: ['Evidence Drive connected', 'Read-only through the write-blocker. FTK Imager can see it now.'], interface: ['USB Audio Interface ready', 'Audacity can use it as a recording device.']}[part];
+  const device = {drive: ['Evidence Drive connected', 'Read-only through the write-blocker. Evidence Imager can see it now.'], interface: ['USB Audio Interface ready', 'Audio Recorder can use it as a recording device.']}[part];
   if (device) app.ui.heldToasts.push({system: true, title: device[0], text: device[1]});
   if (part === 'power') {
     booting = true; app.render();

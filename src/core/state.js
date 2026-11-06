@@ -35,7 +35,7 @@ export function initial() {
 export const available = (s, kind) => (kind === 'text' ? s.copies : kind === 'image' ? !!s.approved.text : kind === 'audio' ? !!s.approved.image : false);
 export const assignmentOf = file => ({witness: 'text', cctv: 'image', statement: 'audio'}[file?.sourceId] ?? null);
 export const lockReason = (s, kind) => (available(s, kind) ? null : {
-  text: 'This assignment opens once the verified working copies have been exported from FTK Imager.',
+  text: 'This assignment opens once the verified working copies have been exported from Evidence Imager.',
   image: 'The photograph assignment is released after Amina approves the text.',
   audio: 'The tape deck is booked. Amina releases the audio assignment after the photograph is approved.',
 }[kind]);
@@ -51,29 +51,27 @@ export function nextTask(s) {
   const text = s.files[WITNESS_PATH], image = s.files[IMAGE_MASTER_PATH];
   const task = (id, t, how, open) => ({id, text: t, how, open});
   if (s.review || s.outbox.length) return {id: 'wait', text: 'Amina is replying', how: '', open: 'chat', quiet: true};
-  if (!s.folderOpened) return task('message', 'Read Amina’s message', 'Open Chat from the notification or from Chrome. Her message has the shared folder in it.', 'chat');
+  if (!s.folderOpened) return task('message', 'Read Amina’s message', 'Open the chat on the right. Her message has the shared folder in it.', 'chat');
   if (!s.briefed) return task('brief', 'Join Amina’s briefing', 'In Chat, click Join on her invitation, then Join now.', 'chat');
-  if (s.inspected.length < 3) return task('records', `Read the intake records (${s.inspected.length} of 3)`, 'In the Drive folder, click each record to read its label.', 'drive');
-  if (!s.intake) return task('intake', 'Complete the evidence intake', 'Rank the items by risk of loss, choose what we are protecting, then confirm.', 'intake');
+  if (!s.intake) return task('intake', 'Complete the evidence intake', 'Open the intake record from Amina’s message. Look at the three items, rank them by risk of loss, choose what we are protecting, then confirm.', 'intake');
   if (!s.hardware.blocker || !s.hardware.drive) return task('bench', 'Connect the evidence drive', 'The computer cannot reach the drive yet. It has to be plugged in at your bench, through the write-blocker.', 'equipment');
-  if (!s.acquisition) return task('acquire', 'Create a disk image', 'In FTK Imager, open the File menu and choose Create Disk Image. Save it to the evidence store and turn on verification.', 'ftk');
-  if (!s.evidenceAdded) return task('addImage', 'Open your disk image', 'In FTK Imager, open the File menu, choose Add Evidence Item, then Image File, and pick drive.E01.', 'ftk');
-  if (!s.copies) return task('export', 'Export the working files', 'In FTK Imager, click [root]/Evidence in the tree, then Export Files, and send them to the Working folder.', 'ftk');
+  if (!s.acquisition) return task('acquire', 'Create a disk image', 'In Evidence Imager, open the File menu and choose Create Disk Image. Save it to the evidence store and turn on verification.', 'ftk');
+  if (!s.copies) return task('export', 'Export the working files', 'In Evidence Imager, click Export working copies, and send them to the Working folder.', 'ftk');
   if (!s.approved.text) {
     if (text?.version > 1 && text.settings.reopened && text.settings.decoding === 'UTF-8') return task('sendText', 'Send the text file to Amina', 'In Chat, click the paperclip, choose witness_working.txt, then press Send.', 'chat');
-    return s.text.opened ? task('fixText', 'Fix and verify the text', 'The Case Record compares the encodings. Choose one, save in Notepad++, close and reopen the file, then verify.', 'case-text') : task('openText', 'Open the witness message', 'In Notepad++, open the File menu, choose Open, and pick witness_working.txt.', 'notepad');
+    return s.text.opened ? task('fixText', 'Make the text read correctly', 'It is reading the bytes with the wrong rulebook. In Text Editor, choose the right one from the Encoding menu, then Save.', 'notepad') : task('openText', 'Open the witness message', 'In Text Editor, open the File menu, choose Open, and pick witness_working.txt.', 'notepad');
   }
   if (!s.approved.image) {
-    if (!s.image.opened) return task('openImage', 'Open the photograph', 'In GIMP, open the File menu, choose Open, and pick cctv_working.jpg.', 'gimp');
-    if (!s.image.rgbDone) return task('pixels', 'Read three pixels', 'In the Case Record, sample the plate, a character and the sky, then match the colour.', 'case-image');
+    if (!s.image.opened) return task('openImage', 'Open the photograph', 'In Image Editor, open the File menu, choose Open, and pick cctv_working.jpg.', 'gimp');
+    if (!s.image.rgbDone) return task('pixels', 'Read a pixel', 'In the Case Record, sample the number plate to see what one pixel holds.', 'case-image');
     if (image?.settings.compared) return task('sendImage', 'Send the image to Amina', 'In Chat, click the paperclip, choose cctv_working.png, then press Send.', 'chat');
-    return task('imageSet', 'Choose the image settings', 'The Case Record walks through size and print. Then use Image > Print Size and File > Export As in GIMP.', 'case-image');
+    return task('imageSet', 'Export the photograph', 'In Image Editor, choose File > Export As. Pick the size and print resolution, then export.', 'gimp');
   }
   if (!s.approved.audio) {
     if (!s.hardware.tape || !s.hardware.interface || !s.hardware.headphones) return task('bench', 'Prepare the tape', 'The tape has to be loaded and connected by hand at your bench before the computer can record it.', 'equipment');
-    if (!s.audio.captured) return task('capture', 'Compare settings, then record', 'The Case Record plays reference clips. Confirm each setting, then press Record in Audacity. The tape plays once.', 'case-audio');
+    if (!s.audio.captured) return task('capture', 'Set up and record', 'In Audio Recorder, choose the sample rate and bit depth, select the audio interface, then press Record. The tape plays once.', 'audacity');
     if (master?.settings.checked) return task('sendAudio', 'Send the audio to Amina', `In Chat, click the paperclip, choose ${master.name}, then press Send.`, 'chat');
-    return task('exportAudio', 'Export the audio master', 'In Audacity, open the File menu and choose Export Audio. Then check the file in the Case Record.', 'audacity');
+    return task('exportAudio', 'Export the audio master', 'In Audio Recorder, open the File menu and choose Export Audio.', 'audacity');
   }
   if (!s.handover) return task('handover', 'Complete the final handover', 'Open the record from Amina’s last message, check each item, then submit.', 'handover');
   if (!s.closingDone) return task('closing', 'Join Amina’s handover review', 'In Chat, click Join on her invitation.', 'chat');
@@ -187,7 +185,6 @@ export function event(state, e) {
     }
     case 'RERANK': require(!s.rerankUsed, 'You have already used the re-rank.'); s.rerankUsed = true; s.riskFeedback = null; s.risk = []; break;
     case 'INTAKE': {
-      require(s.inspected.length === 3, line(s, 'unreadRecord'));
       require(s.briefed, 'Join the briefing first.');
       require(s.risk.length === 3, 'Rank the three items first.');
       s.objectiveHistory.push(e.objective);
@@ -217,6 +214,8 @@ export function event(state, e) {
       require(e.verify, line(s, 'notVerified'));
       s.acquisition = {verified: e.match === true, md5: e.md5 ?? null, sha1: e.sha1 ?? null, badSectors: 0, witnessSha: e.witnessSha ?? null, cctvSha: e.cctvSha ?? null, examiner: s.name};
       makeFile(s, `${DIR.store}\\drive.E01`, {kind: 'evidence', readOnly: true, excluded: true, bytes: 0, label: 'Preserved acquisition image'});
+      // A verified image is added to the evidence tree at once, ready to export from.
+      s.evidenceAdded = true;
       advance(s, [10, 24]);
       break;
     case 'ADD_EVIDENCE': require(s.acquisition, 'Create the image first.'); s.evidenceAdded = true; break;
@@ -230,7 +229,7 @@ export function event(state, e) {
         // The JPEG working copy is the same pixels as the image master, so it shares that allocation.
         makeFile(s, CCTV_WORKING_PATH, {kind: 'image', sourceId: 'cctv', bytes: 0, actualBytes: e.cctvBytes ?? 0, readOnly: true, label: 'Read-only working baseline', settings: {width: SOURCE_SIZE.width, height: SOURCE_SIZE.height, ppi: 72, format: 'JPEG'}});
         advance(s, [10, 40]);
-        say(s, {toast: line(s, 'copiesReady1'), lines: [amina(s, 'copiesReady1'), amina(s, 'copiesReady2', null, {card: {type: 'case', tab: 'text', label: 'Case record: Encoding comparison'}})]});
+        say(s, {toast: line(s, 'copiesReady1'), lines: [amina(s, 'copiesReady1'), amina(s, 'copiesReady2')]});
       }
       break;
     case 'OPEN':
@@ -271,6 +270,8 @@ export function event(state, e) {
     case 'PICK': {
       require(available(s, 'image') && s.image.opened, 'Open the working photograph first.');
       if (e.target) s.image.picks[e.target] = {rgb: e.rgb, x: e.x, y: e.y};
+      // Reading the plate's own pixel is the lesson: what one sample holds.
+      if (e.target === 'plate') { s.image.rgb = e.rgb; s.image.rgbDone = true; }
       break;
     }
     case 'RGB_SET': s.image.rgb = e.rgb; break;
@@ -308,7 +309,7 @@ export function event(state, e) {
     }
     case 'AUDIO_DEVICE': s.audio.device = e.device; break;
     case 'AUDIO_SET': {
-      require(s.audio.opened, 'Open Audacity first.');
+      require(s.audio.opened, 'Open Audio Recorder first.');
       if (s.audio.captured) break;
       Object.assign(s.audio, e.patch);
       s.audio.feedback = null;
@@ -317,7 +318,7 @@ export function event(state, e) {
     case 'AUDIO_PREVIEW': if (!s.audio.previews.includes(e.id)) s.audio.previews.push(e.id); break;
     case 'AUDIO_STEP': {
       // Controls unlock one at a time. A weak choice gets Amina's reason and stays on this step.
-      require(s.audio.opened, 'Open Audacity first.');
+      require(s.audio.opened, 'Open Audio Recorder first.');
       const a = s.audio;
       if (a.step === 0) {
         const key = {8000: 'audio8k', 16000: 'audio16k', 96000: 'audioExcess'}[a.rate];
@@ -336,10 +337,12 @@ export function event(state, e) {
     case 'CAPTURE_BEGIN':
     case 'CAPTURE':
       require(!s.audio.captured, 'Tape already captured. Use the preserved master or the reference previews.');
-      require(available(s, 'audio') && s.audio.opened, lockReason(s, 'audio') ?? 'Open Audacity first.');
+      require(available(s, 'audio') && s.audio.opened, lockReason(s, 'audio') ?? 'Open Audio Recorder first.');
       require(s.hardware.tape && s.hardware.interface && s.hardware.headphones, 'Prepare the tape, interface and headphones at the bench first.');
       require(s.audio.device === 'interface', 'Select the USB Audio Interface as the recording device.');
-      require(s.audio.rate === 44100 && s.audio.bits === 16 && s.audio.step >= 2, 'Use the reference previews to confirm 44.1 kHz and 16-bit before the single capture.');
+      // The tape plays once, so a setting that would lose or invent detail is stopped before it starts.
+      if (s.audio.rate !== 44100) throw Error(line(s, {8000: 'audio8k', 16000: 'audio16k'}[s.audio.rate] ?? 'audioExcess'));
+      if (s.audio.bits !== 16) throw Error(line(s, s.audio.bits === 8 ? 'audio8bit' : 'audioExcess'));
       if (e.type === 'CAPTURE') {
         s.audio.captured = true;
         s.audio.captureRate = s.audio.rate;
@@ -349,7 +352,7 @@ export function event(state, e) {
       }
       break;
     case 'SAVE_AUDIO': {
-      require(available(s, 'audio') && s.audio.opened, lockReason(s, 'audio') ?? 'Open Audacity first.');
+      require(available(s, 'audio') && s.audio.opened, lockReason(s, 'audio') ?? 'Open Audio Recorder first.');
       require(s.audio.captured, line(s, 'audioNoCapture'));
       require(!isEvidencePath(e.path), 'The evidence store is read-only. Export to the Working folder.');
       const previous = s.files[e.path];
@@ -410,10 +413,10 @@ export function event(state, e) {
       s.approved[kind] = {path: sent.path, version: sent.version, settings: sent.settings, bytes: sent.bytes};
       if (kind === 'text') {
         advance(s, [11, 10]);
-        say(s, {toast: line(s, 'textPass'), lines: [amina(s, 'textPass'), ...(firstTime ? [amina(s, 'imageRelease', null, {card: {type: 'case', tab: 'image', label: 'Case record: Pixel and print check'}})] : [])]});
+        say(s, {toast: line(s, 'textPass'), lines: [amina(s, 'textPass'), ...(firstTime ? [amina(s, 'imageRelease', null, {card: {type: 'case', tab: 'image', label: 'Case record: Read a pixel'}})] : [])]});
       } else if (kind === 'image') {
         advance(s, [12, 40]);
-        say(s, {toast: line(s, 'imagePass'), lines: [amina(s, 'imagePass'), ...(firstTime ? [amina(s, 'audioRelease1', null, {card: {type: 'bench', label: 'Go to your bench'}}), amina(s, 'audioRelease2', null, {card: {type: 'case', tab: 'audio', label: 'Case record: ADC comparison'}})] : [])]});
+        say(s, {toast: line(s, 'imagePass'), lines: [amina(s, 'imagePass'), ...(firstTime ? [amina(s, 'audioRelease1', null, {card: {type: 'bench', label: 'Go to your bench'}}), amina(s, 'audioRelease2')] : [])]});
       } else {
         advance(s, [14, 45]);
         say(s, {toast: line(s, 'audioPass'), lines: [amina(s, 'audioPass'), amina(s, 'handoverOpen1', null, {card: {type: 'record', page: 'handover', label: 'Case record: Final handover'}})]});

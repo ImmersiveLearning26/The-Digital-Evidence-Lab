@@ -122,10 +122,10 @@ test('intake needs the correct objective and gives a reason', () => {
   s.intake = false;
   assert.throws(() => step(s, 'INTAKE', {objective: 'enhance'}), /never add to it/);
 });
-test('intake cannot be confirmed with an unread record', () => {
+test('intake does not wait for every record to be opened', () => {
   let s = initial(); s = step(s, 'POWER'); s = step(s, 'LOGIN', {name: 'A'}); s = step(s, 'FOLDER_OPENED'); s = step(s, 'BRIEF');
-  s = step(s, 'INSPECT', {kind: 'text'});
-  assert.throws(() => step(s, 'INTAKE', {objective: 'preserve'}), {message: COPY.unreadRecord});
+  s = step(s, 'RANK', {risk: ['audio', 'text', 'image']});
+  assert.equal(step(s, 'INTAKE', {objective: 'preserve'}).intake, true);
 });
 test('every risk ranking gets a specific reply and never blocks', () => {
   const cases = [[['audio', 'text', 'image'], 'riskBest'], [['text', 'audio', 'image'], 'riskTextFirst'], [['audio', 'image', 'text'], 'riskImageMiddle'], [['text', 'image', 'audio'], 'riskAudioLast'], [['image', 'text', 'audio'], 'riskAudioLast'], [['image', 'audio', 'text'], 'riskImageFirst']];
@@ -230,7 +230,7 @@ test('RGB match needs all three real picks within tolerance', () => {
   for (const target of ['plate', 'character', 'sky']) s = step(s, 'PICK', {target, rgb: [249, 210, 19], x: 1, y: 1});
   assert.throws(() => step(s, 'RGB_MATCH', {rgb: [100, 100, 100]}), /±15/);
 });
-test('image approval releases the bench, not Audacity', () => { const s = imageApproved(); assert.equal(s.audio.opened, false); assert.equal(s.messages.at(-1).card.tab, 'audio'); });
+test('image approval releases the bench, not Audio Recorder', () => { const s = imageApproved(); assert.equal(s.audio.opened, false); assert.ok(s.messages.slice(-2).some(m => m.card?.type === 'bench')); });
 
 test('sampling, quantisation and encoding unlock one at a time with reasons', () => {
   let s = imageApproved();
@@ -252,7 +252,13 @@ test('capture needs the bench, the interface and confirmed settings', () => {
   for (const part of ['tape', 'interface', 'headphones']) s = step(s, 'HARDWARE', {part});
   assert.throws(() => step(s, 'CAPTURE'), /USB Audio Interface/);
   s = step(s, 'AUDIO_DEVICE', {device: 'interface'});
-  assert.throws(() => step(s, 'CAPTURE'), /44\.1 kHz/);
+  // A setting that would lose detail is refused with its reason, before the single pass of the tape.
+  s = step(s, 'AUDIO_SET', {patch: {rate: 8000, bits: 16}});
+  assert.throws(() => step(s, 'CAPTURE'), {message: COPY.audio8k});
+  s = step(s, 'AUDIO_SET', {patch: {rate: 44100, bits: 8}});
+  assert.throws(() => step(s, 'CAPTURE'), {message: COPY.audio8bit});
+  s = step(s, 'AUDIO_SET', {patch: {rate: 44100, bits: 16}});
+  assert.equal(step(s, 'CAPTURE').audio.captured, true);
 });
 test('the tape can be played once', () => { const s = captured(); assert.equal(s.tapePasses, 1); assert.throws(() => step(s, 'CAPTURE'), /already captured/); });
 test('previews do not wear the tape', () => assert.equal(step(step(imageApproved(), 'OPEN', {kind: 'audio'}), 'AUDIO_PREVIEW', {id: 'x'}).tapePasses, 0));

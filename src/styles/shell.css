@@ -1,4 +1,4 @@
-:root{--ui:"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;--web:"Google Sans",Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;--mono:Consolas,Menlo,"Courier New",monospace;--accent:#005fb8;--ink:#1b1f24;--muted:#5a6472;--line:#d9dee5;--ok:#0f6b3a;--ok-bg:#e3f4ea;--warn:#8a4b00;--warn-bg:#fdf1dc;--err:#b3261e}
+:root{--ui:"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;--web:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;--mono:Consolas,Menlo,"Courier New",monospace;--accent:#005fb8;--ink:#1b1f24;--muted:#5a6472;--line:#d9dee5;--ok:#0f6b3a;--ok-bg:#e3f4ea;--warn:#8a4b00;--warn-bg:#fdf1dc;--err:#b3261e}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;font:14px/1.45 var(--ui);color:var(--ink);background:#0b1626}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -229,7 +229,6 @@ svg{display:block}
 .win.opening{animation:winopen 190ms ease}
 .win.min{opacity:0;transform:translateY(14px) scale(.98);pointer-events:none;visibility:hidden}
 .win.max{border-radius:0}
-@keyframes winopen{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .win-title{display:flex;align-items:stretch;flex:none;min-height:34px;background:#f3f5f8;user-select:none}
 .win:not(.active) .win-title{color:#6c7683}
 .win-head{flex:1;min-width:0;display:flex;align-items:center;gap:8px;padding:0 10px;font-size:12.5px}
@@ -272,7 +271,6 @@ svg{display:block}
 #dialogs{position:absolute;inset:0;z-index:7000;pointer-events:none}
 .modal-back{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);pointer-events:auto}
 .modal{background:#fff;border:1px solid rgba(0,0,0,.1);border-radius:8px;box-shadow:0 32px 64px rgba(0,0,0,.19),0 2px 21px rgba(0,0,0,.15);overflow:hidden;max-height:calc(100vh - 70px);display:flex;flex-direction:column;animation:dlg-in 240ms cubic-bezier(0,0,0,1)}
-@keyframes dlg-in{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:none}}
 .modal-title{display:flex;align-items:center;gap:8px;min-height:32px;padding-left:14px;background:#f3f3f3;font-size:12px;cursor:default;flex:none}
 .modal-x{display:flex;align-items:center;justify-content:center;margin-left:auto;width:46px;height:32px;background:none;border:0}
 .modal-x:hover{background:#c42b1c;color:#fff}
@@ -290,7 +288,7 @@ svg{display:block}
 .f-dl dt{color:#4d5866}.f-dl dd{margin:0}
 .f-group{border:1px solid #d3d9e1;border-radius:6px;margin:0 0 10px;padding:8px 12px}
 .f-group legend{font-size:12.5px;padding:0 4px;color:#3e4854}
-.check{display:flex;align-items:center;gap:8px;min-height:30px}
+.check{display:flex;width:fit-content;align-items:center;gap:8px;min-height:30px}
 .dest-row{display:flex;gap:8px;align-items:center}
 .dest-list{flex:1;min-height:58px;background:#fff;border:1px solid #bcc5cf;border-radius:4px;padding:6px;font-size:13px;color:#566170}
 .dest-list .sel{display:block;background:#0a64d6;color:#fff;padding:2px 6px}
@@ -387,3 +385,107 @@ svg{display:block}
 /* With motion reduced, every step is drawn whole. */
 @media (prefers-reduced-motion:reduce){.dm-draw{stroke-dashoffset:0!important}.dm-text,.dm-title,.dm-small{opacity:1!important}}
 .reduce-motion .dm-draw{animation:none;stroke-dashoffset:0}.reduce-motion .dm-text,.reduce-motion .dm-title,.reduce-motion .dm-small{animation:none;opacity:1}
+
+/* ---- A file opened for reading: large, centred, its facts on one hairline row beneath. */
+.modal.viewer{background:#fff}
+.modal.viewer .modal-body{padding:0}
+.vw-head{display:flex;align-items:center;gap:12px;padding:14px 12px 14px 24px}
+.vw-head h2{margin:0;font:600 16px/1.3 "Segoe UI Variable Display",var(--ui)}
+.vw-x{display:flex;align-items:center;justify-content:center;margin-left:auto;width:36px;height:32px;background:none;border:0;border-radius:4px}
+.vw-x:hover{background:rgba(0,0,0,.06)}
+.vw-media{display:flex;align-items:center;justify-content:center;min-height:320px;max-height:min(62vh,560px);padding:0 24px;overflow:auto;background:#f3f3f3}
+.vw-media img{display:block;max-width:100%;max-height:min(60vh,540px);object-fit:contain;border-radius:4px}
+.vw-media .d-quote{max-width:620px;margin:32px auto;font-size:20px;line-height:1.6}
+.vw-media .d-small{display:none}
+.vw-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0;padding:16px 24px 20px;border-top:1px solid rgba(0,0,0,.06)}
+.vw-facts dt{margin:0 0 4px;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.5)}
+.vw-facts dd{margin:0;font-size:13px;line-height:1.45}
+.vw-note{margin:0;padding:0 24px 20px;font-size:13px;color:rgba(0,0,0,.6)}
+
+/* ---- Team Chat, docked on the right: a tab when folded, the full height of the screen when open. */
+#chat-dock{position:absolute;inset:0 0 48px auto;z-index:4000;pointer-events:none}
+#chat-dock>*{pointer-events:auto}
+.dock-tab{position:absolute;right:0;top:42%;display:flex;flex-direction:column;align-items:center;gap:6px;width:56px;padding:10px 0 12px;background:rgba(243,243,243,.9);-webkit-backdrop-filter:blur(30px) saturate(1.25);backdrop-filter:blur(30px) saturate(1.25);border:1px solid rgba(0,0,0,.08);border-right:0;border-radius:10px 0 0 10px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:11px;font-weight:600;color:rgba(0,0,0,.75);animation:dock-in .4s cubic-bezier(.2,.8,.2,1.15)}
+.dock-tab img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.dock-tab:hover{background:#fff;width:62px}
+.dock-tab .badge{position:absolute;top:6px;left:6px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#c42b1c;color:#fff;font:600 11px/18px var(--ui)}
+.dock{position:absolute;right:0;top:0;bottom:0;display:flex;flex-direction:column;width:384px;background:rgba(249,249,249,.94);-webkit-backdrop-filter:blur(30px) saturate(1.25);backdrop-filter:blur(30px) saturate(1.25);border-left:1px solid rgba(0,0,0,.08);box-shadow:-12px 0 32px rgba(0,0,0,.14);animation:dock-open .42s cubic-bezier(.2,.8,.2,1)}
+.dock-head{display:flex;align-items:center;gap:12px;flex:none;padding:14px 10px 12px 16px;border-bottom:1px solid rgba(0,0,0,.06)}
+.dock-head img{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.dock-head strong{display:block;font-size:14px;font-weight:600}
+.dock-head small{font-size:12px;color:rgba(0,0,0,.6)}
+.dock-x{display:flex;align-items:center;justify-content:center;margin-left:auto;width:32px;height:32px;background:none;border:0;border-radius:4px}
+.dock-x:hover{background:rgba(0,0,0,.06)}.dock-x svg{width:16px;height:16px}
+.dock .gc-log{flex:1;min-height:0;overflow:auto;padding:12px 14px}
+.dock .c-card{width:100%}
+.dock .gc-compose{margin:8px 12px 12px;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px}
+.dock .gc-chip{margin:0 12px}
+@keyframes dock-open{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes dock-in{from{transform:translateX(24px)}to{transform:none}}
+.dock-open #toasts{right:396px}.dock-open #toasts.dodge{right:auto}.dock-open .notif,.dock-open .quick{right:394px}
+
+/* ---- One export dialog: size with a live plate, print resolution, format and the reason, side by side. */
+.ex-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px}
+.ex-h{margin:0 0 8px;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(0,0,0,.55)}
+.ex-grid section>.ex-h~.ex-h{margin-top:18px}
+.ex-grid .seg{display:flex;flex-wrap:wrap;gap:6px}
+.ex-grid .seg button,.ex-why button{padding:5px 10px;border:1px solid rgba(0,0,0,.1);border-radius:4px;background:#fdfdfd;font-size:12.5px;transition:background .12s,border-color .12s,transform .12s}
+.ex-grid .seg button.on,.ex-why button.on{background:#e6f0fb;border-color:var(--accent);color:#003e7e}
+.ex-grid .seg button:active,.ex-why button:active{transform:scale(.97)}
+.ex-grid canvas.plate-view{display:block;width:100%;height:auto;margin:10px 0 6px;border-radius:6px;background:#222}
+.ex-read{margin:6px 0 0;font-size:12.5px;line-height:1.5;color:rgba(0,0,0,.72)}
+.ex-why{display:flex;flex-direction:column;gap:6px}
+.ex-why button{text-align:left}
+.ex-to{margin-right:auto;align-self:center;font-size:12px;color:rgba(0,0,0,.6)}
+@media (max-width:700px){.ex-grid{grid-template-columns:1fr}}
+
+/* ---- Motion: soft, springy and satisfying. Progress fills a glowing ring; milestones get a moment. */
+.ring{display:grid;justify-items:center;gap:4px;padding:8px 0 4px}
+.ring svg{width:150px;height:150px;transform:rotate(-90deg);filter:drop-shadow(0 6px 18px rgba(90,140,255,.35))}
+.ring-track{fill:none;stroke:rgba(0,0,0,.07);stroke-width:9}
+.ring-fill{fill:none;stroke:url(#ring-g);stroke-width:9;stroke-linecap:round;stroke-dasharray:100;transition:stroke-dashoffset .25s linear}
+.ring-num{margin-top:-104px;height:64px;display:flex;align-items:baseline;justify-content:center;font:300 40px/64px "Segoe UI Variable Display",var(--ui);color:#1b2b4a}
+.ring-num small{font-size:16px;margin-left:2px;color:rgba(0,0,0,.5)}
+.ring-label{margin:34px 0 0;font-weight:600}
+.ring-sub{margin:0;font-size:12px;color:rgba(0,0,0,.55);word-break:break-all;text-align:center}
+
+.celebrate{position:absolute;left:50%;top:42%;z-index:7000;display:grid;justify-items:center;gap:12px;transform:translate(-50%,-50%);pointer-events:none;animation:cb-out 2.1s ease forwards}
+.cb-orb{position:relative;width:112px;height:112px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#8ee6ff,#3e7bff 55%,#6a3dff);box-shadow:0 0 0 10px rgba(80,140,255,.16),0 18px 50px rgba(60,90,255,.45);animation:cb-pop .55s cubic-bezier(.2,1.4,.3,1) both}
+.cb-orb svg{position:absolute;inset:24px}
+.cb-orb circle{fill:none;stroke:rgba(255,255,255,.35);stroke-width:3}
+.cb-orb path{fill:none;stroke:#fff;stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:1;animation:dm-draw .45s .3s ease forwards}
+.cb-orb i{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px;border-radius:50%;background:#bfe9ff;opacity:0;animation:cb-spark .8s .35s ease-out forwards;transform:rotate(var(--a)) translateY(0)}
+.celebrate p{margin:0;padding:6px 14px;border-radius:999px;background:rgba(20,28,58,.78);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff;font-weight:600;font-size:14px;animation:rise .4s .25s both}
+@keyframes cb-pop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+@keyframes cb-spark{0%{opacity:1;transform:rotate(var(--a)) translateY(0)}100%{opacity:0;transform:rotate(var(--a)) translateY(-78px)}}
+@keyframes cb-out{0%,80%{opacity:1}100%{opacity:0}}
+
+/* Dialogs and windows settle with a little spring; lists arrive one after another. */
+@keyframes dlg-in{0%{opacity:0;transform:scale(.94)}60%{opacity:1;transform:scale(1.012)}100%{transform:none}}
+@keyframes winopen{0%{opacity:0;transform:translateY(10px) scale(.97)}65%{opacity:1;transform:translateY(-1px) scale(1.004)}100%{transform:none}}
+.msg-row{animation:rise .38s cubic-bezier(.2,.9,.3,1.1) both}
+.c-card,.export-row,.lab-card,.sample,.start-grid button,.vw-facts>div{animation:rise .42s cubic-bezier(.2,.9,.3,1.1) both}
+.start-grid button:nth-child(2),.lab-card:nth-of-type(2),.vw-facts>div:nth-child(2){animation-delay:.04s}
+.start-grid button:nth-child(3),.lab-card:nth-of-type(3),.vw-facts>div:nth-child(3){animation-delay:.08s}
+.start-grid button:nth-child(4),.vw-facts>div:nth-child(4){animation-delay:.12s}
+.start-grid button:nth-child(n+5){animation-delay:.16s}
+button:active:not(:disabled){transition:transform .08s}
+.btn:active:not(:disabled),.c-card:active,.dock-tab:active{transform:scale(.97)}
+
+/* A slow aurora behind the welcome title. */
+.splash::before{content:"";position:absolute;inset:-120px -160px -120px -120px;z-index:-1;background:radial-gradient(closest-side at 30% 35%,rgba(90,140,255,.28),transparent),radial-gradient(closest-side at 70% 65%,rgba(130,90,255,.22),transparent),radial-gradient(closest-side at 55% 25%,rgba(55,227,210,.14),transparent);filter:blur(30px);animation:aurora 18s ease-in-out infinite alternate;pointer-events:none}
+@keyframes aurora{0%{transform:translate(0,0) scale(1)}50%{transform:translate(30px,-20px) scale(1.08)}100%{transform:translate(-20px,24px) scale(.96)}}
+@media (prefers-reduced-motion:reduce){.cb-orb path{stroke-dashoffset:0!important}.cb-orb i{display:none}}
+.reduce-motion .cb-orb path{animation:none;stroke-dashoffset:0}.reduce-motion .cb-orb i{display:none}.reduce-motion .splash::before{animation:none}
+
+/* ---- The inner voice: the learner's own thought, quietly subtitled above the taskbar. */
+.thought{position:absolute;left:0;right:0;bottom:72px;z-index:5400;display:flex;align-items:center;gap:12px;width:fit-content;max-width:min(560px,calc(100% - 48px));margin:0 auto;padding:10px 18px 10px 14px;background:rgba(16,22,44,.72);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);border:1px solid rgba(255,255,255,.12);border-radius:14px;color:#eef2fb;pointer-events:none;animation:rise .35s cubic-bezier(.2,.9,.3,1.1) both;transition:opacity .4s}
+.thought.out{opacity:0}
+.thought p{margin:0;font-size:14.5px;line-height:1.45;font-style:italic}
+.th-mark{flex:none;width:10px;height:10px;border-radius:50%;background:#37e3d2;box-shadow:0 0 0 4px rgba(55,227,210,.2);animation:th-pulse 1.4s ease-in-out infinite}
+@keyframes th-pulse{50%{box-shadow:0 0 0 7px rgba(55,227,210,.06)}}
+
+/* With the chat open, dialogs centre in the space left of it. */
+body:has(#session.dock-open) .modal-back{right:384px}
+/* The Start menu and the inner voice centre in the desktop beside the open chat, never under it. */
+body:has(#session.dock-open) .start-menu{left:calc((100% - 384px) / 2)}

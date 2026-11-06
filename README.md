@@ -12,7 +12,7 @@ npm start
 
 Then open http://127.0.0.1:4173. Use the local server, not `file://`.
 
-The small gear at the bottom left is the developer panel: preview screens, seed a stage (marks the run as developer-assisted), freeze, edit Amina's draft lines, inspect state.
+Learners see no developer controls. Open http://127.0.0.1:4173/?dev to show the gear at the bottom left: preview screens, seed a stage (marks the run as developer-assisted), freeze, edit Amina's draft lines, inspect state.
 
 ## Tests
 
@@ -39,9 +39,15 @@ Plays the whole learner path in Chromium with the 3D bench on, including wrong p
 
 **Amina's chat lines.** All chat copy is in `src/content/copy.js`.
 
+**The inner voice.** The learner's own thoughts are in `src/content/thoughts.js`: one per task, a few self-corrections after a refused attempt, and a few for each milestone. Each `say` carries `eleven_v3` voice directions; the subtitle shows the words alone. Recordings go in `assets/media/voice/thoughts/<key>.mp3` (a `:` in the key becomes `-`), in the ElevenLabs voice Olamide. Run `node scripts/build-thoughts.mjs` after adding any; it lists what is still missing. A line with no recording shows as a subtitle only.
+
+**No brands.** No real company's name or logo appears. The apps have plain names (Browser, Team Chat, Case Drive, Video Call, Evidence Imager, Text Editor, Image Editor, Audio Recorder) and original icons in `src/desktop/icons.js`, and the wallpaper is drawn for this project. Logos on the supplied models are painted out by `scripts/clean_brand_textures.py`, whose results in `assets/models/tex/clean/` the Blender build swaps in; it also removes the headphones' raised model-name letters.
+
 ## What the learner sees
 
-Only what the current step needs. Apps reach the desktop when their stage arrives (`appAvailable()` in `src/core/state.js`), the bench offers one action at a time, and Case Record shows released work one step at a time. Amina's tips (`nextTask()`) stay by the side like a Windows notification, with a number while unopened. "Show me how" holds back the detail until the learner asks. The bulb in the tray brings a hidden tip back.
+Only what the current step needs. Team Chat is docked on the right: a tab when folded, the full height of the screen when open, and windows move over to make room. Files open large in the middle of the screen (`src/desktop/viewer.js`). Each evidence task is one clear decision inside its tool: the text is fixed from the Encoding menu and checked as it saves; the photograph has one pixel read, then one export dialog for size, print resolution, format and reason, which checks itself against the source; the tape's sample rate and bit depth are chosen in the recorder with listen buttons, and the export checks itself. The calls run about a minute and half a minute. Progress fills a glowing ring, and each milestone gets a short celebration (`src/desktop/motion.js`).
+
+Apps reach the desktop when their stage arrives (`appAvailable()` in `src/core/state.js`), the bench offers one action at a time, and Case Record shows released work one step at a time. Amina's tips (`nextTask()`) stay by the side like a Windows notification, with a number while unopened. "Show me how" holds back the detail until the learner asks. The bulb in the tray brings a hidden tip back.
 
 A notification stays readable for 16 seconds, then shrinks to a small pill until it is opened, so it neither vanishes nor covers the work underneath. Past messages are behind the clock.
 
@@ -71,7 +77,7 @@ To rebuild the model without the Blender connector:
 
 | Real | Simulated or estimated |
 |---|---|
-| Text bytes: encoding, decoding, mojibake, byte counts, saved files | Windows, Google and vendor apps are recreated interfaces, with no real accounts |
+| Text bytes: encoding, decoding, mojibake, byte counts, saved files | The operating system and apps are generic recreations, with no real accounts or brands |
 | Image pixels: colour reading, resampling, PNG export with PPI stored in the file | Acquisition speed: imaging takes seconds |
 | MD5, SHA-1 and SHA-256 over the simulated drive's actual bytes | The E01 is a record, not a real disk image |
 | Audio comparisons: resampled with anti-aliasing, quantised to 8-bit, played through Web Audio | The 10-minute tape is represented by a 10-second clip |
@@ -82,9 +88,10 @@ Image storage counts width × height × 3, as the storyboard does. The actual PN
 ## Open items
 
 - **Voice:** Amina cannot say the learner's own name aloud, because the calls are prerecorded and names are typed in. Chat uses the name. Check the voice's licence terms before public release.
+- **Inner voice:** 4 of 26 lines are recorded; the ElevenLabs account ran out of credits. The rest show as subtitles until recorded (`node scripts/build-thoughts.mjs` lists them, about 1,800 characters).
 - **Tape format:** the story calls the tape a microcassette, but the supplied recorder and cassette are full-size compact-cassette models, and a microcassette cannot play in that deck. Either the wording or the models should change.
 - **Scoring:** numeric scores stay hidden. The storyboard sets weights and grade bands but no point-level rubric, so it needs SME approval. `weightedScore()` is ready.
-- **Logos:** app logos and the MIVA slot come from the reference images or are stand-ins. Clear these before any public release.
+- **MIVA logo:** the welcome page names MIVA Open University in text; the logo slot is still empty.
 - **Room:** the floor and wall are plain planes in `src/three/equipment.js`, because no room model was supplied.
 - **Credits:** see `CREDITS.md`, including the hard drive's licence.
 
@@ -94,7 +101,7 @@ Image storage counts width × height × 3, as the storyboard does. The actual PN
 src/core       case state, validators, byte operations, clock, audio, storage
 src/content    Amina's lines, call scripts, image list
 src/desktop    window manager, dialogs, taskbar, equipment bench, developer panel
-src/apps       Chat, Drive, Meet, lab records, Explorer, Case Record, FTK, Notepad++, GIMP, Audacity
+src/apps       Team Chat, Case Drive, Video Call, lab records, Explorer, Case Record, Evidence Imager, Text Editor, Image Editor, Audio Recorder
 src/three      3D bench: loads the GLB, plays clips, pins the desktop to the monitor
 scripts        server, evidence generator, image extraction, voice builder, Blender build
 docs           original kit specification

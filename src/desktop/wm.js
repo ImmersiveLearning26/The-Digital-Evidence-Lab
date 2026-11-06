@@ -7,7 +7,18 @@ export const floats = new Map();
 export const registerApp = meta => { apps[meta.id] = meta; if (meta.actions) app.register(meta.actions, meta.inputs); };
 const elements = new Map();
 const TASKBAR = 48;
-const area = () => ({w: innerWidth, h: innerHeight - TASKBAR});
+// The open chat panel takes the right of the screen; windows use the space left of it.
+export const DOCK = 384;
+const area = () => ({w: innerWidth - (app.ui.dock?.open ? DOCK : 0), h: innerHeight - TASKBAR});
+// Opening the panel moves any window that would sit under it over to the left, shrinking it if it must.
+export function reflowForDock() {
+  const {w: W} = area();
+  for (const w of app.ui.windows) {
+    if (w.max) continue;
+    if (w.w > W) w.w = W;
+    if (w.x + w.w > W) w.x = Math.max(0, W - w.w);
+  }
+}
 
 export const win = id => app.ui.windows.find(w => w.id === id);
 export const isOpen = id => !!win(id);

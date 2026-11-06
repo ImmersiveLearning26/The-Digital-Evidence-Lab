@@ -19,7 +19,7 @@ export function openFileForLearner(path) {
   if (ext === 'txt') return handlers.text?.(path);
   if (['jpg', 'png'].includes(ext) && f.settings.representation !== 'screenshot') return handlers.image?.(path);
   if (['flac', 'wav', 'mp3'].includes(ext)) return handlers.audio?.(path);
-  if (ext === 'e01') return app.guide('Add this image to FTK Imager with File > Add Evidence Item.');
+  if (ext === 'e01') return app.guide('Add this image to Evidence Imager with File > Add Evidence Item.');
   return app.guide(`${f.name} has no viewer in this lab.`);
 }
 

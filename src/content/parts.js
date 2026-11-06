@@ -2,7 +2,7 @@
 // Node names live in assets/asset-manifest.json under "parts".
 export const PARTS = {
   monitor: {name: 'Monitor', note: 'Your forensic workstation’s screen'},
-  tower: {name: 'Workstation', note: 'Runs FTK Imager, Notepad++, GIMP and Audacity'},
+  tower: {name: 'Workstation', note: 'Runs Evidence Imager, Text Editor, Image Editor and Audio Recorder'},
   blocker: {name: 'Write-blocker', note: 'Lets the computer read the drive, never write to it'},
   drive: {name: 'Evidence drive', note: 'Case 0417 original. Only ever connected through the blocker'},
   recorder: {name: 'Cassette deck', note: 'Plays the witness tape for capture'},

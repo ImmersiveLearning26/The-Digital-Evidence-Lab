@@ -1,4 +1,5 @@
-// FTK Imager wrapper. Acquisition is short and simulated, but its hashes are computed over real bytes.
+// Evidence Imager wrapper. Acquisition is short and simulated, but its hashes are computed over real bytes.
+import {ring} from '../desktop/motion.js';
 import {app} from '../runtime.js';
 import {emptyState, esc, reducedMotion} from '../desktop/dom.js';
 import {icons} from '../desktop/icons.js';
@@ -27,7 +28,7 @@ const menus = () => [
   ]},
   {name: 'View', items: [{label: 'Evidence Tree', checked: true}, {label: 'File List', checked: true}, {label: 'Properties', checked: true}]},
   {name: 'Mode', items: [{label: 'Automatic', checked: true}, {label: 'Text'}, {label: 'Hex'}]},
-  {name: 'Help', items: [{label: 'Help Topics'}, {label: 'About FTK Imager'}]},
+  {name: 'Help', items: [{label: 'Help Topics'}, {label: 'About Evidence Imager'}]},
 ];
 
 function hexDump(bytes) {
@@ -40,22 +41,22 @@ function hexDump(bytes) {
 }
 
 registerApp({
-  id: 'ftk', title: 'FTK Imager', icon: icons.ftk, rect: {x: .04, y: .03, w: .74, h: .85},
-  windowTitle: () => 'AccessData FTK Imager',
+  id: 'ftk', title: 'Evidence Imager', icon: icons.ftk, rect: {x: .04, y: .03, w: .74, h: .85},
+  windowTitle: () => 'Evidence Imager',
   view() {
     const s = app.s, st = f();
     const list = st.folder ? IMAGE_FILES : [];
     const sel = IMAGE_FILES.find(x => x.id === st.selected);
     const bytes = sel && evidence ? evidence[sel.id].bytes : null;
-    const tool = !s.acquisition ? '<button data-action="ftk:create">Create Disk Image</button>' : !s.evidenceAdded ? '<button data-action="ftk:add">Add Evidence Item</button>' : !s.copies ? `<button data-action="ftk:export" ${st.folder ? '' : 'disabled'}>Export Files</button>` : '';
-    const empty = !s.hardware.drive ? emptyState('No evidence drive detected', 'FTK Imager cannot see the drive. It has to be connected at your bench, through the write-blocker.')
+    const tool = !s.acquisition ? '<button data-action="ftk:create">Create Disk Image</button>' : !s.evidenceAdded ? '<button data-action="ftk:add">Add Evidence Item</button>' : !s.copies ? '<button data-action="ftk:export">Export working copies</button>' : '';
+    const empty = !s.hardware.drive ? emptyState('No evidence drive detected', 'Evidence Imager cannot see the drive. It has to be connected at your bench, through the write-blocker.')
       : !s.acquisition ? emptyState('Evidence Drive 0417 detected', 'Read-only through the write-blocker, and ready to image.')
       : emptyState('drive.E01 is in the evidence store', 'Open it here to reach the files inside.');
     const panes = `<div class="ftk-panes ${sel ? '' : 'one-row'}"><section class="ftk-tree"><h3>Evidence Tree</h3><ul><li>▾ ${icons.disk}<span>drive.E01</span><ul><li>▾ Partition 1 [NTFS]<ul><li><button class="tree-btn ${st.folder ? 'sel' : ''}" data-action="ftk:folder">${icons.folder}<span>[root]/Evidence</span></button></li></ul></li></ul></li></ul></section>
     <section class="ftk-list"><h3>File List</h3>${list.length ? `<table><thead><tr><th>Name</th><th>Size</th><th>Type</th><th>Date Modified</th></tr></thead><tbody>${list.map(x => `<tr class="${st.selected === x.id ? 'sel' : ''}" data-key="${x.id}"><td><button class="tree-btn" data-action="ftk:file" data-id="${x.id}">${icons.file}<span>${x.name}</span></button></td><td>${evidence ? formatBytes(evidence[x.id].bytes.length) : ''}</td><td>Regular File</td><td>16/04/2026</td></tr>`).join('')}</tbody></table>` : '<p class="ftk-empty">Select a folder in the tree.</p>'}</section>
     ${sel ? `<section class="ftk-props"><h3>Properties</h3><dl><dt>Image</dt><dd>E:\\EvidenceStore\\0417\\drive.E01</dd><dt>Case</dt><dd>${CASE_ID}</dd><dt>Examiner</dt><dd>${esc(s.acquisition?.examiner)}</dd><dt>Verified</dt><dd>${s.acquisition?.verified ? 'Yes, hashes match' : 'No'}</dd></dl></section>
     <section class="ftk-view"><h3>${esc(sel.name)}</h3>${bytes ? `<pre tabindex="0" aria-label="Hex view of ${esc(sel.name)}">${esc(hexDump(bytes))}</pre>` : ''}</section>` : ''}</div>`;
-    return `<div class="ftk">${menubar('ftk', menus())}${tool ? `<div class="ftk-tools" role="toolbar" aria-label="FTK Imager tools">${tool}</div>` : ''}
+    return `<div class="ftk">${menubar('ftk', menus())}${tool ? `<div class="ftk-tools" role="toolbar" aria-label="Evidence Imager tools">${tool}</div>` : ''}
     ${s.evidenceAdded ? panes : `<div class="ftk-start">${empty}</div>`}
     <footer class="status-bar"><span>${esc(app.ui.status.ftk ?? 'For Help, press F1')}</span><span>Write-blocker: ${s.hardware.blocker ? 'on' : 'not detected'}</span><span>Evidence drive: ${s.hardware.drive ? 'connected' : 'not connected'}</span></footer></div>`;
   },
@@ -125,8 +126,8 @@ function addDestination() {
 async function acquire() {
   const e = await loadEvidence();
   const dialog = modal({
-    title: 'Creating Image...', width: 460, closable: false, state: {p: 0},
-    view: st => `<p>Image Source: \\\\.\\PHYSICALDRIVE1</p><p>Destination: E:\\EvidenceStore\\0417\\drive.E01</p><div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(st.p)}" aria-label="Imaging progress"><i style="width:${st.p}%"></i></div><p class="d-small">Shortened for the simulation. ${st.p < 62 ? 'Creating image' : 'Verifying image'}, ${Math.round(st.p)}%.</p>`,
+    title: 'Creating Image...', width: 420, closable: false, state: {p: 0},
+    view: st => `${ring(st.p, st.p < 70 ? 'Imaging the evidence drive' : 'Verifying the image', 'PHYSICALDRIVE1 → E:\\EvidenceStore\\0417\\drive.E01')}<p class="d-small">Shortened for the simulation. A real drive takes much longer.</p>`,
   });
   await app.clock.tween(reducedMotion() ? 300 : 2600, u => { dialog.api.state.p = u * 100; dialog.api.update(); });
   dialog.api.close();

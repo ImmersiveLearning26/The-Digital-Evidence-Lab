@@ -1,0 +1,21 @@
+{
+ "voice": "Olamide (ElevenLabs, eleven_v3)",
+ "lines": {
+  "message": {
+   "file": "assets/media/voice/thoughts/message.mp3",
+   "duration": 7.63
+  },
+  "brief": {
+   "file": "assets/media/voice/thoughts/brief.mp3",
+   "duration": 5.64
+  },
+  "debrief": {
+   "file": "assets/media/voice/thoughts/debrief.mp3",
+   "duration": 2.27
+  },
+  "oops:1": {
+   "file": "assets/media/voice/thoughts/oops-1.mp3",
+   "duration": 4.13
+  }
+ }
+}

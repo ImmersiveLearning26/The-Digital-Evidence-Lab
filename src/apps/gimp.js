@@ -1,4 +1,4 @@
-// GIMP: a canvas over the actual photograph pixels. Picks read real pixels, Scale resamples real pixels,
+// Image Editor: a canvas over the actual photograph pixels. Picks read real pixels, Scale resamples real pixels,
 // Export writes a real PNG. An enlargement keeps the smaller pixel store, because it adds no information.
 import {app} from '../runtime.js';
 import {clamp, emptyState, esc} from '../desktop/dom.js';
@@ -183,7 +183,10 @@ async function scaleDialog() {
     },
   });
   if (!ok) return;
-  const w = ok, h = Math.round(w * ratio);
+  resizeTo(ok);
+}
+function resizeTo(w) {
+  const h = Math.round(w * doc.h / doc.w);
   if (w <= doc.pxW) {
     // Real resampling: discarded pixels are gone until the file is reverted.
     const next = pixelCanvas(w, h), nctx = next.getContext('2d', {willReadFrequently: true});
@@ -207,26 +210,6 @@ async function printDialog() {
   doc.ppi = ppi; doc.dirty = true;
   app.status('gimp', 'Print density changed. The pixels did not.');
 }
-async function exportAs() {
-  if (!doc) return app.status('gimp', 'Open an image first.');
-  const path = await fileDialog({
-    mode: 'save', title: 'Export Image', name: IMAGE_MASTER_PATH.split('\\').pop(), dir: DIR.working, filter: ['png', 'jpg'], typeLabel: 'PNG image (*.png)', saveLabel: 'Export',
-    validate: p => (p === CCTV_WORKING_PATH ? 'cctv_working.jpg is the read-only working baseline. Export a separate PNG.' : p.endsWith('.png') ? null : 'Export a PNG. Another JPEG save would recompress the evidence.'),
-  });
-  if (!path) return;
-  app.status('gimp', 'Exporting…');
-  let blobKey = null, actualBytes = null;
-  if (doc.w === doc.pxW) {
-    const blob = await new Promise(r => doc.px.toBlob(r, 'image/png'));
-    const png = pngWithPpi(new Uint8Array(await blob.arrayBuffer()), doc.ppi);
-    blobKey = path; actualBytes = png.length;
-    await putBlob(path, new Blob([png], {type: 'image/png'}));
-  }
-  if (app.attempt({type: 'SAVE_IMAGE', path, width: doc.w, height: doc.h, ppi: doc.ppi, detailWidth: doc.detailW, actualBytes, blobKey})) {
-    doc.path = path; doc.dirty = false; doc.reopened = false; g().reopened = false; doc.version = app.s.files[path].version;
-    app.status('gimp', `Exported ${path.split('\\').pop()}${actualBytes ? ` (${formatBytes(actualBytes)} actual PNG)` : ''}. Reopen it to check it.`);
-  }
-}
 const menus = () => [
   {name: 'File', items: [{label: 'Open...', action: 'gi:open', key: 'Ctrl+O'}, {label: 'Revert', action: 'gi:revert', disabled: !doc}, '-', {label: 'Export As...', action: 'gi:export', key: 'Shift+Ctrl+E', disabled: !doc}, {label: 'Close', action: 'gi:close-doc', disabled: !doc}]},
   {name: 'Edit', items: [{label: 'Undo'}, {label: 'Preferences'}]}, {name: 'Select', items: [{label: 'All'}, {label: 'None'}]},
@@ -236,8 +219,8 @@ const menus = () => [
 ];
 const TOOLS = [['picker', 'Color Picker'], ['zoom', 'Zoom'], ['move', 'Pan']];
 registerApp({
-  id: 'gimp', title: 'GIMP', icon: icons.gimp, rect: {x: .012, y: .012, w: .695, h: .97},
-  windowTitle: () => (doc ? `${doc.dirty ? '*' : ''}[${doc.path.split('\\').pop().split('.')[0]}] (imported)-1.0 (RGB color 8-bit gamma integer, GIMP built-in sRGB, 1 layer) ${doc.w}x${doc.h} – GIMP` : 'GNU Image Manipulation Program'),
+  id: 'gimp', title: 'Image Editor', icon: icons.gimp, rect: {x: .012, y: .012, w: .695, h: .97},
+  windowTitle: () => (doc ? `${doc.dirty ? '*' : ''}[${doc.path.split('\\').pop().split('.')[0]}] (imported)-1.0 (RGB color 8-bit gamma integer, built-in sRGB, 1 layer) ${doc.w}x${doc.h} – Image Editor` : 'Image Editor'),
   mount() {
     const path = g().path;
     if (path && app.s.files[path] && !doc) load(path);
@@ -260,7 +243,7 @@ registerApp({
   actions: {
     'gi:open': askOpen,
     'gi:revert': () => doc && load(doc.path),
-    'gi:export': exportAs, 'gi:scale': scaleDialog, 'gi:print': printDialog,
+    'gi:export': exportDialog, 'gi:scale': scaleDialog, 'gi:print': printDialog,
     'gi:close-doc': () => { doc = null; g().path = null; app.render(); },
     'gi:tool': el => { g().tool = el.dataset.tool; app.render(); },
     'gi:zoom': el => zoomBy(Number(el.dataset.arg)),
@@ -272,65 +255,27 @@ registerApp({
 const c = () => (app.ui.imageCase ??= {dim: 4000, result: null});
 const DIMS = [[640, 480, 'Unreadable', 'You can’t read what was never captured.'], [1280, 960, 'Marginal', 'Characters start to merge.'], [4000, 3000, 'Clearly legible', 'The original: within budget.'], [8000, 6000, 'Blurred', 'More pixels, no new information.']];
 const PRINTS = [[72, 'Blocky'], [150, 'Soft: small details blur'], [300, 'Sharp, and available from the 4000-pixel original'], [1200, 'Needs far more pixels than the original has']];
-function samples() {
-  const picks = app.s.image.picks;
-  return `<div class="samples">${[['plate', 'Plate background'], ['character', 'Character'], ['sky', 'Sky']].map(([k, label]) => {
-    const p = picks[k], rgb = p?.rgb, t = TARGETS[k];
-    return `<div class="sample"><span class="sw" style="background:rgb(${(rgb ?? [230, 230, 230]).join(',')})"></span><div><strong>${label}</strong><small>${rgb ? `Read R ${rgb[0]}, G ${rgb[1]}, B ${rgb[2]}` : `Target about ${t.join(', ')}`}</small></div><button class="btn sm" data-action="ic:goto" data-t="${k}" aria-label="Go to ${label} pixel and sample it">${rgb ? '✓ Again' : 'Sample'}</button></div>`;
-  }).join('')}</div>`;
-}
-function matchPanel() {
-  const rgb = app.s.image.rgb, picks = app.s.image.picks, ready = ['plate', 'character', 'sky'].every(t => picks[t]);
-  if (app.s.image.rgbDone) return `<div class="feedback ok"><strong>RGB check complete</strong><p>Each pixel is three values from 0 to 255: 24 bits, or 3 bytes, with 16,777,216 possible colours.</p></div>`;
-  return `<div class="match ${ready ? '' : 'dim'}"><div class="swatches"><span style="background:rgb(${(picks.plate?.rgb ?? [200, 200, 200]).join(',')})" aria-label="Plate sample"></span><span style="background:rgb(${rgb.join(',')})" aria-label="Your mix"></span></div>${['R', 'G', 'B'].map((n, i) => `<label class="slider"><span>${n}</span><input type="range" min="0" max="255" value="${rgb[i]}" data-input="ic:rgb" data-i="${i}" aria-label="${n} channel" ${ready ? '' : 'disabled'}><output>${rgb[i]}</output></label>`).join('')}<button class="btn" data-action="ic:match" ${ready ? '' : 'disabled'}>Match swatch</button><p class="d-small">${ready ? 'Mix the plate colour. Each channel must be within ±15.' : 'Sample all three pixels first.'}</p></div>`;
-}
-const STEPS = ['Read pixels', 'Compare sizes', 'Print size', 'Explain and check'];
 registerCaseTab({
   id: 'image',
+  // One pixel, read: what a sample holds. Size and print are chosen where they are used, in Export.
   view() {
-    const s = app.s, file = s.files[IMAGE_MASTER_PATH], st = c();
-    const reached = s.image.rgbDone ? Math.max(st.reached ?? 2, 2) : 1;
-    const step = Math.min(st.step ?? 1, reached);
-    const header = `<ol class="stepper">${STEPS.map((t, i) => `<li class="${i + 1 < reached ? 'done' : i + 1 === step ? 'on' : ''}"><button data-action="ic:step" data-n="${i + 1}" ${i + 1 <= reached ? '' : 'disabled'}>${i + 1 < reached ? '✓ ' : ''}${t}</button></li>`).join('')}</ol>`;
-    const next = n => `<button class="btn primary" data-action="ic:next" data-n="${n}">Continue</button>`;
-    let body;
-    if (step === 1) {
-      body = `<p class="cr-lead">Pixels are the samples that make up a digital image. Each one holds red, green and blue values.</p>${doc ? '' : '<p class="cr-next">Open cctv_working.jpg in GIMP.</p>'}${samples()}${matchPanel()}${s.image.rgbDone ? next(2) : ''}`;
-    } else if (step === 2) {
-      const dim = st.dim, row = DIMS.find(d => d[0] === dim);
-      body = `<p class="cr-lead">More pixels mean more detail and more storage, up to what the camera captured. Compare the plate at each size.</p><div class="seg" role="radiogroup" aria-label="Dimensions">${DIMS.map(([w, h]) => `<button role="radio" aria-checked="${dim === w}" class="${dim === w ? 'on' : ''}" data-action="ic:dim" data-w="${w}">${w} × ${h}</button>`).join('')}</div>
-      <canvas class="plate-view" data-w="${dim}" width="300" height="180" aria-label="Number plate rendered at ${dim} pixels wide"></canvas>
-      <dl class="f-dl"><dt>Plate width</dt><dd>about ${plateWidth(dim)} px</dd><dt>RGB estimate</dt><dd>${formatBytes(imageBytes(row[0], row[1]))}${imageBytes(row[0], row[1]) > ITEM_LIMIT ? ', over the 100 MB budget' : ''}</dd><dt>Result</dt><dd>${row[2]}. ${row[3]}</dd></dl>${next(3)}`;
-    } else if (step === 3) {
-      body = `<p class="cr-lead">PPI sets how densely pixels print. For a 10 × 7.5 inch print, pixels needed = inches × PPI. Changing PPI alone adds no detail.</p>
-      <table class="mini"><thead><tr><th>PPI</th><th>Pixels needed</th><th>Storage</th></tr></thead><tbody>${PRINTS.map(([ppi, note]) => { const w = printPixels(10, ppi), h = printPixels(7.5, ppi); return `<tr title="${esc(note)}"><td>${ppi}</td><td>${w} × ${h}</td><td>${formatBytes(imageBytes(w, h))}</td></tr>`; }).join('')}</tbody></table><p class="d-small">Your retained file stays 4000 × 3000 and prints at 13.33 × 10 in at 300 PPI.</p>${next(4)}`;
-    } else {
-      const checked = file?.settings.compared;
-      body = `<p class="cr-next">${!file ? 'In GIMP, keep 4000 × 3000, set Image > Print Size to 300 PPI, then use File > Export As.' : checked ? 'Now attach cctv_working.png in Chat and send it to Amina.' : 'Reopen cctv_working.png in GIMP, then compare it here.'}</p>
-      <label class="lab-field"><span>Why these settings?</span><textarea data-input="ic:why" aria-label="Why these image settings?">${esc(s.image.rationale)}</textarea></label>
-      ${file && !checked ? '<button class="btn primary" data-action="ic:compare">Compare with source</button>' : ''}${st.result ? `<div class="feedback ${st.result.ok ? 'ok' : 'warn'}" role="status"><strong>${esc(st.result.title)}</strong><p>${esc(st.result.text)}</p></div>` : ''}`;
-    }
-    return `<div class="cr-pad"><h2>Image</h2>${header}${body}</div>`;
+    const s = app.s, file = s.files[IMAGE_MASTER_PATH], rgb = s.image.picks.plate?.rgb;
+    const next = !s.image.rgbDone ? '' : file?.settings.compared ? 'Now send cctv_working.png to Amina in the chat.' : 'Now export it: in Image Editor, choose File > Export As.';
+    return `<div class="cr-pad"><h2>Image</h2><p class="cr-lead">A digital image is a grid of samples called pixels. Each one holds three numbers: red, green and blue.</p>
+      ${doc ? '' : '<p class="cr-next">Open cctv_working.jpg in Image Editor.</p>'}
+      <div class="samples"><div class="sample"><span class="sw" style="background:rgb(${(rgb ?? [230, 230, 230]).join(',')})"></span><div><strong>Number plate</strong><small>${rgb ? `R ${rgb[0]}, G ${rgb[1]}, B ${rgb[2]}` : 'Not read yet'}</small></div><button class="btn ${rgb ? '' : 'primary'}" data-action="ic:goto" data-t="plate" aria-label="Go to the plate pixel and sample it">${rgb ? 'Again' : 'Sample'}</button></div></div>
+      ${s.image.rgbDone ? `<div class="feedback ok"><strong>One pixel is three bytes</strong><p>Each value runs from 0 to 255, so a pixel takes 24 bits. That gives 16,777,216 possible colours, and it is why more pixels always means a bigger file.</p></div>` : ''}
+      ${next ? `<p class="cr-next">${next}</p>` : ''}</div>`;
   },
   after(el) { const pv = el.querySelector('canvas.plate-view'); if (pv) drawPlate(pv); },
   actions: {
     'ic:goto': el => {
-      if (!doc) return app.guide('Open the working photograph in GIMP first.');
+      if (!doc) return app.guide('Open the working photograph in Image Editor first.');
       if (doc.w !== SOURCE_SIZE.width) return app.guide('Sample from the original-resolution working copy. Use File > Revert.');
       const t = el.dataset.t;
       focusOn(t);
       const [x, y] = meta.samples[t];
       pick(x, y);
-    },
-    'ic:match': () => app.attempt({type: 'RGB_MATCH', rgb: app.s.image.rgb}),
-    'ic:dim': el => { c().dim = Number(el.dataset.w); app.render(); },
-    'ic:step': el => { c().step = Number(el.dataset.n); app.render(); },
-    'ic:next': el => {
-      const n = Number(el.dataset.n);
-      c().step = n;
-      c().reached = Math.max(c().reached ?? 2, n);
-      if (n === 2) fit();
-      app.render();
     },
     'ic:compare': compareFile,
   },
@@ -355,12 +300,7 @@ async function drawPlate(canvas) {
   g2.imageSmoothingEnabled = s > 1;
   g2.drawImage(tmp, 0, 0, canvas.width, canvas.height);
 }
-async function compareFile() {
-  const say = (ok, title, text) => { c().result = {ok, title, text}; app.render(); };
-  const f = app.s.files[IMAGE_MASTER_PATH];
-  if (!doc || doc.path !== IMAGE_MASTER_PATH) return say(false, 'Not open', 'Open cctv_working.png in GIMP first.');
-  if (!doc.reopened) return say(false, 'Not reopened yet', 'Use File > Open to reopen the exported file, so you check what was saved.');
-  if (doc.dirty) return say(false, 'Unsaved changes', 'Export your changes first.');
+async function plateDiff() {
   const src = await source(), e = await loadEvidence(), p = e.meta.plate;
   const a = pixelCanvas(p.w, p.h), ax = a.getContext('2d', {willReadFrequently: true});
   ax.drawImage(src, p.x, p.y, p.w, p.h, 0, 0, p.w, p.h);
@@ -370,7 +310,73 @@ async function compareFile() {
   const da = ax.getImageData(0, 0, p.w, p.h).data, db = bx.getImageData(0, 0, p.w, p.h).data;
   let sum = 0;
   for (let i = 0; i < da.length; i += 4) sum += Math.abs(da[i] - db[i]) + Math.abs(da[i + 1] - db[i + 1]) + Math.abs(da[i + 2] - db[i + 2]);
-  const diff = sum / (p.w * p.h * 3), match = diff < 1;
+  const diff = sum / (p.w * p.h * 3);
+  return {diff, match: diff < 1};
+}
+
+// Export in one place: size with a live look at the plate, print resolution, format and the reason.
+// It saves to the Working folder and checks itself against the source, so nothing needs reopening.
+const WHY = ['Keeps every pixel the camera captured', 'Prints the plate sharply at the size needed', 'Smallest file to send'];
+async function exportDialog() {
+  if (!doc) return app.status('gimp', 'Open an image first.');
+  const draw = api => requestAnimationFrame(() => { const cv = api.element.querySelector('canvas.plate-view'); if (cv) drawPlate(cv); });
+  const dialog = modal({
+    title: 'Export Image', width: 640, owner: 'gimp',
+    state: {w: doc.w, ppi: doc.ppi, why: app.s.image.rationale ?? ''},
+    view: st => {
+      const row = DIMS.find(d => d[0] === st.w) ?? [st.w, Math.round(st.w * .75), '', ''], bytes = imageBytes(row[0], row[1]);
+      const print = PRINTS.find(p => p[0] === st.ppi);
+      return `<div class="ex-grid">
+        <section><h3 class="ex-h">Size</h3><div class="seg" role="radiogroup" aria-label="Size">${DIMS.map(([w, h]) => `<button role="radio" aria-checked="${st.w === w}" class="${st.w === w ? 'on' : ''}" data-m="dim" data-w="${w}">${w} × ${h}</button>`).join('')}</div>
+          <canvas class="plate-view" data-w="${st.w}" width="300" height="180" aria-label="The number plate at ${st.w} pixels wide"></canvas>
+          <p class="ex-read">${row[2] ? `<b>${esc(row[2])}.</b> ${esc(row[3])}` : ''} Plate about ${plateWidth(st.w)} px wide · ${formatBytes(bytes)}${bytes > ITEM_LIMIT ? ', over the 100 MB budget' : ''}</p></section>
+        <section><h3 class="ex-h">Print resolution</h3><div class="seg" role="radiogroup" aria-label="Print resolution">${PRINTS.map(([ppi]) => `<button role="radio" aria-checked="${st.ppi === ppi}" class="${st.ppi === ppi ? 'on' : ''}" data-m="ppi" data-ppi="${ppi}">${ppi} PPI</button>`).join('')}</div>
+          <p class="ex-read">Prints at ${printInches(st.w, st.ppi).toFixed(2)} × ${printInches(row[1], st.ppi).toFixed(2)} in.${print ? ` ${esc(print[1])}.` : ''} The print case needs 10 × 7.5 in.</p>
+          <h3 class="ex-h">Format</h3><p class="ex-read">PNG, lossless. Saving another JPEG would recompress the evidence.</p>
+          <h3 class="ex-h">Why these settings?</h3><div class="ex-why">${WHY.map(w => `<button class="${st.why === w ? 'on' : ''}" data-m="why" data-why="${esc(w)}">${esc(w)}</button>`).join('')}</div></section>
+      </div><footer class="modal-foot"><span class="ex-to">Saves to Working › cctv_working.png</span><button class="btn" data-m="cancel">Cancel</button><button class="btn primary" data-m="ok" data-default>Export</button></footer>`;
+    },
+    actions: {
+      dim: (el, ev, api) => { api.state.w = Number(el.dataset.w); api.update(); draw(api); },
+      ppi: (el, ev, api) => { api.state.ppi = Number(el.dataset.ppi); api.update(); },
+      why: (el, ev, api) => { api.state.why = el.dataset.why; api.update(); draw(api); },
+      ok: (el, ev, api) => api.close({...api.state}),
+    },
+  });
+  draw(dialog.api);
+  const chosen = await dialog;
+  if (!chosen) return;
+  if (chosen.w !== doc.w) resizeTo(chosen.w);
+  doc.ppi = chosen.ppi;
+  if (chosen.why) app.dispatch({type: 'RATIONALE', kind: 'image', text: chosen.why});
+  const path = IMAGE_MASTER_PATH;
+  app.status('gimp', 'Exporting…');
+  // While the file is written and read back there is nothing to do but wait.
+  app.ui.exporting = true;
+  try { await writeImage(path); } finally { app.ui.exporting = false; app.render(); }
+}
+async function writeImage(path) {
+  let blobKey = null, actualBytes = null;
+  if (doc.w === doc.pxW) {
+    const blob = await new Promise(r => doc.px.toBlob(r, 'image/png'));
+    const png = pngWithPpi(new Uint8Array(await blob.arrayBuffer()), doc.ppi);
+    blobKey = path; actualBytes = png.length;
+    await putBlob(path, new Blob([png], {type: 'image/png'}));
+  }
+  if (!app.attempt({type: 'SAVE_IMAGE', path, width: doc.w, height: doc.h, ppi: doc.ppi, detailWidth: doc.detailW, actualBytes, blobKey})) return;
+  doc.path = path; doc.dirty = false; doc.reopened = true; g().reopened = true; g().path = path; doc.version = app.s.files[path].version;
+  const {diff, match} = await plateDiff();
+  app.attempt({type: 'IMAGE_CHECK', path, reopened: true, plateMatch: match});
+  app.status('gimp', `Exported cctv_working.png${actualBytes ? ` (${formatBytes(actualBytes)})` : ''} and checked it: plate pixels ${match ? 'match the source' : `differ from the source by ${diff.toFixed(1)} on average`}.`);
+}
+
+async function compareFile() {
+  const say = (ok, title, text) => { c().result = {ok, title, text}; app.render(); };
+  const f = app.s.files[IMAGE_MASTER_PATH];
+  if (!doc || doc.path !== IMAGE_MASTER_PATH) return say(false, 'Not open', 'Open cctv_working.png in Image Editor first.');
+  if (!doc.reopened) return say(false, 'Not reopened yet', 'Use File > Open to reopen the exported file, so you check what was saved.');
+  if (doc.dirty) return say(false, 'Unsaved changes', 'Export your changes first.');
+  const {diff, match} = await plateDiff(), p = (await loadEvidence()).meta.plate;
   app.attempt({type: 'IMAGE_CHECK', path: f.path, reopened: true, plateMatch: match});
   say(match, match ? 'Plate pixels match the source' : 'Plate pixels differ from the source', `Average difference ${diff.toFixed(2)} of 255 across ${p.w} × ${p.h} plate pixels. File is ${doc.w} × ${doc.h} at ${doc.ppi} PPI, ${formatBytes(f.actualBytes ?? 0)} actual, ${formatBytes(f.bytes)} RGB estimate.`);
 }

@@ -48,7 +48,7 @@ for (const [w, h] of [[1920, 1080], [1366, 768], [1024, 640], [683, 384]]) {
 }
 
 section('keyboard');
-// Keyboard: open a file in Notepad++ with no mouse.
+// Keyboard: open a file in Text Editor with no mouse.
 {
   const p = await open();
   await toStage(p, 'text');
@@ -136,8 +136,8 @@ section('windows');
   await p.locator('[data-action="shell:task"][data-id="notepad"]').click();
   await p.locator('.file-dialog').waitFor();
   ok(true, 'It comes back when the window is restored');
-  await p.locator('[data-action="shell:task"][data-id="browser"]').click();
-  ok(await p.evaluate(() => window.__app.ui.active === 'browser'), 'Another app can be used while a dialog is open');
+  await p.locator('[data-action="shell:task"][data-id="explorer"]').click();
+  ok(await p.evaluate(() => window.__app.ui.active === 'explorer'), 'Another app can be used while a dialog is open');
   await p.locator('[data-action="shell:task"][data-id="notepad"]').click();
   await p.locator('.file-dialog .btn:has-text("Cancel")').click();
   // Snap: drag a title bar to the left edge, then to the top.
@@ -170,7 +170,7 @@ section('windows');
 }
 
 section('gimp reload');
-// GIMP comes back with its file after a reload.
+// Image Editor comes back with its file after a reload.
 {
   const p = await open();
   await toStage(p, 'image');
@@ -184,7 +184,7 @@ section('gimp reload');
   await p.locator('.gi-layer').waitFor();
   await p.reload();
   await p.locator('.gi-layer').waitFor({timeout: 8000});
-  ok(true, 'GIMP reopens its image after a reload');
+  ok(true, 'Image Editor reopens its image after a reload');
   if (SHOTS) await p.screenshot({path: `${SHOTS}/gimp-full.png`});
   await p.context().close();
 }
@@ -196,15 +196,15 @@ section('watch how');
   await toStage(p, 'image');
   ok(!(await p.locator('.tip-watch').count()), 'No demo is offered before the learner is stuck');
   for (let i = 0; i < 2; i++) {
-    await p.evaluate(() => window.__app.guide('Open the working photograph in GIMP first.'));
+    await p.evaluate(() => window.__app.guide('Open the working photograph in Image Editor first.'));
     await p.locator('.modal.cd .btn').first().click();
   }
   await p.locator('.tip-watch').waitFor({timeout: 5000});
   ok(true, 'Two refused attempts offer Watch how it’s done');
   await p.locator('.tip-watch').click();
   await p.locator('.modal.demo .dm-stage').waitFor();
-  await p.waitForFunction(() => [...document.querySelectorAll('.dm-stage text')].some(t => t.textContent === 'GIMP'), null, {timeout: 8000});
-  ok(true, 'The demo opens and draws the step in GIMP');
+  await p.waitForFunction(() => [...document.querySelectorAll('.dm-stage text')].some(t => t.textContent === 'Image Editor'), null, {timeout: 8000});
+  ok(true, 'The demo opens and draws the step in Image Editor');
   await p.locator('.modal.demo [data-m="close"]').click();
   ok(!(await p.locator('.modal.demo').count()), 'Got it closes the demo');
   await p.context().close();

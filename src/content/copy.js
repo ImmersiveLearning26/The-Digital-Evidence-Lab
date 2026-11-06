@@ -17,14 +17,14 @@ export const COPY = {
   objectiveEnhance: "We reveal what's there. We never add to it.",
   objectiveCommon: 'Each media type needs its own representation. One common format would not serve all three.',
   unreadRecord: 'Read the remaining evidence label before confirming.',
-  afterIntake: "Connect the evidence drive through the write-blocker. Then open FTK Imager and create a verified image in the evidence store. We'll process copies from that image.",
+  afterIntake: "Connect the evidence drive through the write-blocker. Then open Evidence Imager and create a verified image in the evidence store. We'll process copies from that image.",
 
   noBlocker: 'Connect through the write-blocker first. We need to protect the source from changes.',
   sourceAsDestination: 'Choose the evidence store as the destination. Do not write back to the source drive.',
   notVerified: 'The copy has not passed verification. Check the source connection and complete the verification before exporting working files.',
   wrongSourceDrive: 'That is the workstation system drive. Choose the protected evidence drive for this case.',
   copiesReady1: 'The acquisition is verified. Keep that preserved image unchanged.',
-  copiesReady2: 'Open Notepad++ and load witness_working.txt from the Working folder. Compare the text representations, save a faithful text copy, then reopen it to check the decoding.',
+  copiesReady2: 'Open witness_working.txt in Text Editor. If it doesn’t read right, the bytes are fine: fix how they’re read, save, and send it to me.',
 
   asciiLoss: 'Some characters have become question marks. Return to the preserved text and choose an encoding that can keep every character.',
   latin1Loss: 'The accent survives, but the symbols and emoji do not. Check the preview against the source.',
@@ -34,7 +34,7 @@ export const COPY = {
   textNotReopened: 'Close the saved file, reopen it and check how it reads before you send it.',
   textChanged: 'The characters no longer match the preserved source. Compare your copy with the original text.',
   textPass: 'Every character is intact and searchable. The text is approved.',
-  imageRelease: "I've released the photograph assignment. Open GIMP, then open cctv_working.jpg from the Working folder. Inspect the plate and its pixels before choosing the output settings.",
+  imageRelease: "I've released the photograph. Open cctv_working.jpg in Image Editor and read one pixel of the plate. Then export it at a size and print resolution we can actually use.",
 
   rgbIncomplete: 'Inspect the plate, a character and the sky, then finish the RGB match.',
   imageTooLow: 'The plate has lost useful detail. Compare this output with the original-resolution working copy.',
@@ -44,8 +44,8 @@ export const COPY = {
   imageRationale: 'Add a short reason for your image settings to the case record, then send it again.',
   imageNotChecked: 'Reopen the exported image and compare it with the source before you send it.',
   imagePass: 'The plate is legible, the original is unchanged, and your image fits the allocation.',
-  audioRelease1: 'The tape deck is available now. Prepare the microcassette and audio interface at the bench. Then open Audacity and select the interface as the recording input.',
-  audioRelease2: 'Use the reference previews to compare settings before you capture the tape. Preserve the quiet speech and the door buzzer.',
+  audioRelease1: 'The tape deck is available now. Prepare the microcassette and audio interface at the bench. Then open Audio Recorder and select the interface as the recording input.',
+  audioRelease2: 'In Audio Recorder, listen to the settings before you record. Keep the quiet speech and the door buzzer. The tape plays once.',
 
   audio8k: "The buzzer's important high-frequency content is missing. The sampling rate is too low for this task.",
   audio16k: 'Speech is clearer, but the buzzer is not fully represented. Compare with 44.1 kHz.',
@@ -56,7 +56,7 @@ export const COPY = {
   audioOverBudget: 'This exceeds the audio allocation. Review the settings while keeping the speech and buzzer.',
   audioRationale: 'Add a short reason for your audio settings to the case record, then send it again.',
   audioNotChecked: 'Check the exported file against your capture in the case record before you send it.',
-  audioNoCapture: 'Capture the tape in Audacity before you export a master.',
+  audioNoCapture: 'Capture the tape in Audio Recorder before you export a master.',
   audioPass: 'The lossless master preserves the required speech and buzzer, within the allocation.',
   handoverOpen1: 'All three outputs are ready for your final check. Open the processing record, review each item against its requirement, and confirm the originals remain unchanged.',
 

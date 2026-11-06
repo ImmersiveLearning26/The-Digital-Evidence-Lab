@@ -10,7 +10,9 @@ import {noteRefusal, startGuide} from './desktop/guide.js';
 import {initBench, renderEquipment, stationFor} from './desktop/equipment.js';
 import {devPanel} from './desktop/dev.js';
 import './apps/browser.js';
-import './apps/chat.js';
+import {renderDock} from './apps/chat.js';
+import {watchMilestones} from './desktop/motion.js';
+import {think, watchThoughts} from './desktop/thoughts.js';
 import './apps/drive.js';
 import './apps/meet.js';
 import './apps/records.js';
@@ -29,6 +31,7 @@ const FREE_WHEN_PAUSED = new Set(['pause:resume', 'dev:toggle', 'dev:pause', 'de
 
 app.onGuide = async text => {
   noteRefusal();
+  think('oops');
   const atDesk = app.ui.mode === 'desktop' && /write-blocker first|at the bench/.test(text);
   const go = await message({title: 'Case guidance', text, buttons: atDesk ? [['Go to my bench', true], ['Close', false]] : [['OK', true]]});
   if (atDesk && go) app.setMode('equipment');
@@ -103,7 +106,7 @@ app.onPump = () => {
       const group = app.s.outbox[0];
       if (!group) return;
       app.dispatch({type: 'DELIVER'});
-      const reading = app.ui.active === 'browser' && app.ui.browser.active === 'chat' && app.ui.mode === 'desktop';
+      const reading = app.ui.dock?.open && app.ui.mode === 'desktop';
       if (!reading) { app.ui.unread += group.lines.length; addToast(group.toast); } else app.audio.notify();
       app.render();
     });
@@ -119,6 +122,10 @@ app.onPump = () => {
 
 app.views.add(renderShell);
 app.views.add(renderEquipment);
+app.views.add(renderDock);
+app.views.add(watchMilestones);
+app.views.add(watchThoughts);
+app.think = think;
 app.views.add(() => {
   morph(document.getElementById('dev-host'), devPanel());
   document.getElementById('paused').hidden = !app.ui.paused;

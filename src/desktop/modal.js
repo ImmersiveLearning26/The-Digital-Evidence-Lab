@@ -1,7 +1,7 @@
 // Native-style dialogs. Own focus trap, Esc to cancel, and focus returns to whatever opened them.
 import {app} from '../runtime.js';
 import {esc, morph} from './dom.js';
-import {floats, focusWindow, win} from './wm.js';
+import {DOCK, floats, focusWindow, win} from './wm.js';
 
 let depth = 0;
 export const dialogOpen = () => depth > 0;
@@ -84,7 +84,7 @@ export function modal({title, cls = '', view, state = {}, actions = {}, width = 
   api.update();
   if (attached) {
     const r = box.getBoundingClientRect();
-    back.style.left = `${Math.max(8, (innerWidth - r.width) / 2)}px`;
+    back.style.left = `${Math.max(8, (innerWidth - (app.ui.dock?.open ? DOCK : 0) - r.width) / 2)}px`;
     back.style.top = `${Math.max(8, (innerHeight - 48 - r.height) / 2)}px`;
   }
   return Object.assign(new Promise(r => { resolve = r; requestAnimationFrame(() => (box.querySelector('[data-autofocus]') ?? box.querySelector('[data-default]:not([disabled])') ?? box.querySelector('input,select,button:not(.modal-x)'))?.focus()); }), {api});

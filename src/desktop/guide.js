@@ -31,10 +31,6 @@ function path(task, s, ui) {
   switch (task.id) {
     case 'message': return {app: 'browser', page: 'chat', controls: ['[data-action="toast:open"]', '.c-card[data-action="chat:drive"]']};
     case 'brief': case 'closing': return {app: 'browser', page: ui.browser.active === 'meet' ? 'meet' : 'chat', controls: ['[data-action="meet:join"]', 'last:.c-card[data-action="chat:meet"]']};
-    case 'records': {
-      const next = ['text', 'image', 'audio'].find(k => !s.inspected.includes(k));
-      return {app: 'browser', page: 'drive', controls: [`[data-action="drive:open"][data-kind="${next}"]`]};
-    }
     case 'intake': {
       const f = ui.intake ?? {rank: []};
       if (s.risk.length !== 3) return {app: 'browser', page: 'intake', controls: [f.rank?.every(Boolean) && f.rank.length === 3 ? '[data-action="intake:rank"]' : '.rank-row']};
@@ -45,50 +41,37 @@ function path(task, s, ui) {
       '.modal[aria-label="Image Destination"] [data-m="ok"]', '.modal[aria-label="Select Source"] [data-m="next"]', '.modal[aria-label="Select Drive"] [data-m="next"]',
       document.querySelector('.dest-list .sel') ? (document.querySelector('.modal[aria-label="Create Image"] input[type=checkbox]')?.checked ? '.modal[aria-label="Create Image"] [data-m="start"]' : '.modal[aria-label="Create Image"] .check') : '.modal[aria-label="Create Image"] [data-m="add"]',
       '.ftk-tools [data-action="ftk:create"]']};
-    case 'addImage': return {app: 'ftk', controls: [fileDialogStep('drive.E01'), '.modal[aria-label="Select Source"] [data-m="next"]', '.ftk-tools [data-action="ftk:add"]']};
-    case 'export': return {app: 'ftk', controls: ['.modal[aria-label="Browse For Folder"] [data-m="ok"]', ui.ftk?.folder ? '.ftk-tools [data-action="ftk:export"]' : '[data-action="ftk:folder"]']};
+    case 'export': return {app: 'ftk', controls: ['.modal[aria-label="Browse For Folder"] [data-m="ok"]', '.ftk-tools [data-action="ftk:export"]']};
     case 'openText': return {app: 'notepad', skill: 'open', controls: [fileDialogStep(fileName(WITNESS_PATH)), '.npp-tools [data-action="np:open"]']};
     case 'fixText': {
+      // Open it, choose how it is read (the whole list glows: the choice is the learner's), then Save.
       const d = ui.np?.doc;
-      const inFile = (s.files[WITNESS_PATH]?.version ?? 1) > 1;
-      if (d?.dirty) return {app: 'notepad', skill: 'save', controls: ['.npp-tools [data-action="np:save"]']};
-      if (document.querySelector('.reps')) {
-        if (ui.textCase?.rep) return {app: 'case', controls: ['[data-action="tc:load"]', '.reps']};
-        return {app: 'case', controls: ['.reps']};
-      }
       if (!d) return {app: 'notepad', skill: 'open', controls: [fileDialogStep(fileName(WITNESS_PATH)), '.npp-tools [data-action="np:open"]']};
-      if (d.savedHere) return {app: 'notepad', controls: ['.npp-tools [data-action="np:close"]']};
-      if (inFile && d.encoding !== 'UTF-8' && ui.textCase?.result && !ui.textCase.result.ok) return {app: 'notepad', controls: ['.npp .dropdown', '.npp [data-action="menu:toggle"][data-name="Encoding"]']};
-      return {app: 'case', controls: ['[data-action="tc:verify"]']};
+      if (d.encoding === 'ANSI' && !d.dirty) return {app: 'notepad', controls: ['.npp .dropdown', '.npp [data-action="menu:toggle"][data-name="Encoding"]']};
+      return {app: 'notepad', skill: 'save', controls: ['.npp-tools [data-action="np:save"]']};
     }
     case 'sendText': return send(fileName(WITNESS_PATH));
     case 'openImage': return {app: 'gimp', skill: 'open', controls: [fileDialogStep('cctv_working.jpg'), ...menuThen('gimp', 'File', 'gi:open')]};
-    case 'pixels': {
-      const missing = ['plate', 'character', 'sky'].find(t => !s.image.picks[t]);
-      return {app: 'case', controls: missing ? [`[data-action="ic:goto"][data-t="${missing}"]`] : ['.match']};
-    }
+    case 'pixels': return {app: 'case', controls: ['[data-action="ic:goto"][data-t="plate"]']};
     case 'imageSet': {
-      const png = s.files[IMAGE_MASTER_PATH], step = ui.imageCase?.step ?? 1;
-      if (step < 4) return {app: 'case', controls: ['[data-action="ic:next"]']};
-      if (!png) {
-        if (document.querySelector('.gi-dock')?.textContent.includes('300 PPI')) return {app: 'gimp', skill: 'menu', controls: ['.file-dialog [data-m="confirm"]', ...menuThen('gimp', 'File', 'gi:export')]};
-        return {app: 'gimp', skill: 'menu', controls: ['.modal[aria-label="Set Image Print Resolution"] input', ...menuThen('gimp', 'Image', 'gi:print')]};
-      }
-      if (ui.gimp?.reopened && ui.gimp.path === IMAGE_MASTER_PATH) return {app: 'case', controls: ['[data-action="ic:compare"]']};
-      return {app: 'gimp', skill: 'open', controls: [fileDialogStep(fileName(IMAGE_MASTER_PATH)), ...menuThen('gimp', 'File', 'gi:open')]};
+      if (app.ui.exporting) return {app: 'gimp', controls: []};
+      const dialog = '.modal[aria-label="Export Image"]';
+      if (document.querySelector(dialog)) return {app: 'gimp', controls: [document.querySelector(`${dialog} .ex-why .on`) ? `${dialog} [data-m="ok"]` : `${dialog} .ex-grid`]};
+      return {app: 'gimp', skill: 'menu', controls: menuThen('gimp', 'File', 'gi:export')};
     }
     case 'sendImage': return send(fileName(IMAGE_MASTER_PATH));
     case 'capture': {
       const a = s.audio;
       if (!a.opened) return {app: 'audacity', controls: []};
-      if (a.step < 3) return {app: 'case', controls: [document.querySelector('.ab-row') && a.previews.length < 2 ? '.ab-row' : '[data-action="ac:confirm"]']};
+      // The settings are the learner's call: the whole strip glows until they have changed the weak defaults.
+      if (a.rate === 8000 && a.bits === 8) return {app: 'audacity', controls: ['.au-setup']};
       if (a.device !== 'interface') return {app: 'audacity', controls: ['.au-device select[data-input="au:device"]']};
       return {app: 'audacity', controls: ['[data-action="au:record"]']};
     }
     case 'exportAudio': {
-      const unchecked = document.querySelector('[data-action="ac:check"]');
-      if (unchecked) return {app: 'case', controls: ['[data-action="ac:check"]']};
-      return {app: 'audacity', skill: 'menu', controls: ['.modal[aria-label="Export Audio"] [data-m="ok"]', ...menuThen('audacity', 'File', 'au:export')]};
+      const dialog = '.modal[aria-label="Export Audio"]';
+      if (document.querySelector(dialog)) return {app: 'audacity', controls: [document.querySelector(`${dialog} .ex-why .on`) ? `${dialog} [data-m="ok"]` : `${dialog} .ex-why`]};
+      return {app: 'audacity', skill: 'menu', controls: menuThen('audacity', 'File', 'au:export')};
     }
     case 'sendAudio': {
       const master = Object.values(s.files).find(f => f.sourceId === 'statement' && ['FLAC', 'WAV'].includes(f.settings.format));
@@ -129,6 +112,14 @@ function pick(selector) {
 }
 // When the control is out of sight, the glow goes to whatever brings it into view.
 function reach(step) {
+  // Chat is the panel on the right: unfold it to reach anything in it.
+  if (step.page === 'chat') return app.ui.dock?.open ? null : pick('.dock-tab');
+  // A page that is not open yet is reached the way the learner got there: from Amina's card in the chat panel.
+  const opened = step.page && app.ui.browser.tabs.includes(step.page);
+  if (step.page && !opened) {
+    if (!app.ui.dock?.open) return pick('.dock-tab');
+    return pick(step.page === 'drive' ? 'last:.c-card[data-action="chat:drive"]' : step.page === 'meet' ? 'last:.c-card[data-action="chat:meet"]' : `last:.c-card[data-page="${step.page}"]`);
+  }
   const w = step.app && win(step.app);
   if (step.app && !w) {
     const open = ['.start-grid [data-id="' + step.app + '"]', `.d-icon[data-open="${step.app}"]`, `[data-action="shell:task"][data-id="${step.app}"]`, '.tb-start'];
@@ -137,15 +128,14 @@ function reach(step) {
   if (step.app && (w.min || app.ui.active !== step.app)) return pick(`[data-action="shell:task"][data-id="${step.app}"]`);
   if (step.app === 'case' && step.tab && app.ui.caseTab !== step.tab) return pick(`.cr-tabs [data-tab="${step.tab}"]`);
   if (step.page && app.ui.browser.active !== step.page) {
-    // A page that is not open yet is reached the way the learner got there: from Amina's message.
-    const tab = pick(`.tab-name[data-id="${step.page}"]`);
-    if (tab) return tab;
-    if (app.ui.browser.active !== 'chat') return pick('.tab-name[data-id="chat"]') ?? pick('[data-action="br:new"]');
-    return pick(step.page === 'drive' ? 'last:.c-card[data-action="chat:drive"]' : `last:.c-card[data-page="${step.page}"]`);
+    return pick(`.tab-name[data-id="${step.page}"]`);
   }
   return null;
 }
 function target() {
+  // A file open in the viewer covers everything else: closing it is the way back.
+  const viewer = document.querySelector('.modal.viewer [data-m="close"]');
+  if (viewer) return {el: viewer};
   const task = nextTask(app.s), step = task.quiet ? null : path(task, app.s, app.ui);
   if (!step) return null;
   if (step.app === 'case') step.tab = {fixText: 'text', pixels: 'image', imageSet: 'image', capture: 'audio', exportAudio: 'audio'}[task.id];
@@ -169,10 +159,13 @@ function reveal(found) {
 function dodge(el) {
   const stack = document.getElementById('toasts');
   if (!stack) return;
-  const r = stack.getBoundingClientRect(), t = el?.getBoundingClientRect(), mirror = {left: innerWidth - r.right, right: innerWidth - r.left};
+  // Home is bottom right, beside the chat when it is open; the other place is bottom left.
+  const r = stack.getBoundingClientRect(), t = el?.getBoundingClientRect();
+  const homeRight = innerWidth - (app.ui.dock?.open ? 396 : 12);
+  const home = {left: homeRight - r.width, right: homeRight}, away = {left: 12, right: 12 + r.width};
   const under = x => !!t && !stack.contains(el) && !!r.height && t.left < x.right && t.right > x.left && t.top < r.bottom && t.bottom > r.top;
   const moved = stack.classList.contains('dodge');
-  stack.classList.toggle('dodge', moved ? under(mirror) && !under(r) : under(r) && !under(mirror));
+  stack.classList.toggle('dodge', !t ? false : under(home) && !under(away) ? true : under(away) && !under(home) ? false : moved);
 }
 
 const glow = () => document.getElementById('nudge');

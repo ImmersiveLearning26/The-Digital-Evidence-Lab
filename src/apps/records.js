@@ -21,14 +21,12 @@ const OBJECTIVES = [
 const intakeForm = () => (app.ui.intake ??= {rank: ['', '', ''], objective: ''});
 function intakeView() {
   const s = app.s, f = intakeForm();
-  const read = s.inspected.length === 3;
-  const unread = ['text', 'image', 'audio'].filter(k => !s.inspected.includes(k)).map(k => NAMES[k].toLowerCase());
   const ranked = s.risk.length === 3;
   const rankLocked = ranked && (s.rerankUsed || !s.riskFeedback || s.riskFeedback.ok);
   const rows = [['audio', 'Audio', 'Recorded statement', 'Analogue microcassette. Wears with each playback.'], ['text', 'Document', 'Witness message', 'Text export from a phone with degrading storage.'], ['image', 'Image', 'CCTV still', 'JPEG from a stable source.']];
   return shell('Evidence intake', `<h1>Evidence intake</h1><p class="lab-sub">Case ${CASE_ID}</p>
-  <table class="lab-table"><thead><tr><th>Item</th><th>Description</th><th>Status</th></tr></thead><tbody>${rows.map(([k, sub, n, d]) => `<tr><td><strong>${NAMES[k]}</strong><small>${sub}</small></td><td>${n}. ${d}</td><td>${s.inspected.includes(k) ? '<span class="tag ok">✓ Inspected</span>' : '<span class="tag">Not inspected</span>'}</td></tr>`).join('')}</tbody></table>
-  ${!read ? `<p class="lab-need" role="status">Read the remaining evidence label first: ${esc(unread.join(', '))}. The records are in the shared Drive folder.</p>` : !s.briefed ? '<p class="lab-need" role="status">Join Amina’s briefing first.</p>' : `
+  <table class="lab-table"><thead><tr><th>Item</th><th>Description</th><th>Record</th></tr></thead><tbody>${rows.map(([k, sub, n, d]) => `<tr><td><strong>${NAMES[k]}</strong><small>${sub}</small></td><td>${n}. ${d}</td><td><button class="btn sm" data-action="drive:open" data-kind="${k}" aria-label="View the ${NAMES[k].toLowerCase()} record">${s.inspected.includes(k) ? '✓ Viewed' : 'View'}</button></td></tr>`).join('')}</tbody></table>
+  ${!s.briefed ? '<p class="lab-need" role="status">Join Amina’s briefing first.</p>' : `
   <section class="lab-card"><h2>Rank the risk of loss</h2><p>Which could we lose for good? Highest risk first. This never changes the work order.</p>
    <div class="rank-row">${['Highest risk', 'Middle', 'Lowest risk'].map((label, i) => `<label class="lab-field"><span>${label}</span><select data-input="intake:rank" data-i="${i}" aria-label="${label}" ${rankLocked || s.intake ? 'disabled' : ''}><option value="">Choose</option>${Object.entries(NAMES).map(([k, n]) => `<option value="${k}" ${(ranked ? s.risk[i] : f.rank[i]) === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>`).join('')}</div>
    ${ranked ? '' : '<button class="btn" data-action="intake:rank">Record ranking</button>'}
@@ -137,7 +135,7 @@ function feedback(key) {
   const cards = {
     preservation: {
       choice: `You ranked ${riskFirst.map(k => NAMES[k]).join(', then ') || 'the items'} and confirmed "keep the original information intact and verifiable".${wrongObjectives.length ? ` You first chose a different objective ${wrongObjectives.length === 1 ? 'once' : `${wrongObjectives.length} times`}.` : ''}`,
-      result: `The drive went through the hardware write-blocker. FTK Imager verified the image. Hashes of the witness message and the photograph still match their baselines, and the tape was played ${s.tapePasses} time${s.tapePasses === 1 ? '' : 's'}.`,
+      result: `The drive went through the hardware write-blocker. Evidence Imager verified the image. Hashes of the witness message and the photograph still match their baselines, and the tape was played ${s.tapePasses} time${s.tapePasses === 1 ? '' : 's'}.`,
       why: 'If we alter an original, we can never prove what it said. Hardware blocks writes to the source; software acquires and verifies the image.',
       expert: riskStrong ? 'Next-level insight: the booked deck set the work order, not the risk. In real practice you would process the most fragile item first.' : 'Strongest path: tape, then the degrading phone, then the stable photograph. The tape wears with every playback, so that loss cannot be undone.',
     },

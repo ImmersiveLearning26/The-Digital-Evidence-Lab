@@ -8,6 +8,8 @@ export const pages = {};
 export const registerPage = page => { pages[page.id] = page; if (page.actions) app.register(page.actions, page.inputs); };
 
 app.openPage = (id, extra = {}) => {
+  // Chat is not a browser tab: it is the panel docked on the right.
+  if (id === 'chat') return app.openDock();
   const b = app.ui.browser;
   if (!b.tabs.includes(id)) b.tabs.push(id);
   visit(id);
@@ -23,9 +25,11 @@ function visit(id) {
 }
 
 registerApp({
-  id: 'browser', title: 'Google Chrome', icon: icons.chrome, rect: {x: .03, y: .02, w: .9, h: .85},
+  id: 'browser', title: 'Browser', icon: icons.chrome, rect: {x: .03, y: .02, w: .9, h: .85},
   titleHtml() {
     const b = app.ui.browser;
+    b.tabs = b.tabs.filter(id => pages[id]);
+    if (b.active && !pages[b.active]) b.active = b.tabs.at(-1) ?? null;
     return `<div class="tabs" role="tablist">${b.tabs.map(id => `<div class="tab ${b.active === id ? 'on' : ''}" role="tab" aria-selected="${b.active === id}"><button class="tab-name" data-action="br:tab" data-id="${id}">${pages[id].icon}<span>${esc(pages[id].tabTitle?.() ?? pages[id].title)}</span>${id === 'chat' && app.ui.unread ? `<b class="tab-dot">${app.ui.unread}</b>` : ''}</button><button class="tab-x" data-action="br:close" data-id="${id}" aria-label="Close ${esc(pages[id].title)} tab">×</button></div>`).join('')}<button class="tab-new" data-action="br:new" aria-label="New tab">+</button></div>`;
   },
   view() {
@@ -55,6 +59,6 @@ registerApp({
 
 registerPage({
   id: 'newtab', title: 'New tab', icon: icons.chrome, url: () => 'chrome://newtab',
-  view: () => `<div class="newtab"><h1>Where to?</h1><div class="newtab-grid"><button data-action="nt:open" data-to="chat">${icons.chat}<span>Chat</span></button>${app.s.folderOpened ? `<button data-action="nt:open" data-to="drive">${icons.drive}<span>Drive</span></button>` : ''}${app.s.briefed ? `<button data-action="nt:open" data-to="intake">${icons.record}<span>Case record</span></button>` : ''}</div></div>`,
+  view: () => `<div class="newtab"><h1>Where to?</h1><div class="newtab-grid"><button data-action="nt:open" data-to="chat">${icons.chat}<span>Team Chat</span></button>${app.s.folderOpened ? `<button data-action="nt:open" data-to="drive">${icons.drive}<span>Drive</span></button>` : ''}${app.s.briefed ? `<button data-action="nt:open" data-to="intake">${icons.record}<span>Case record</span></button>` : ''}</div></div>`,
   actions: {'nt:open': el => { const b = app.ui.browser; b.tabs = b.tabs.filter(t => t !== 'newtab'); app.openPage(el.dataset.to); }},
 });

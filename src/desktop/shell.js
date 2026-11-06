@@ -8,8 +8,8 @@ import {appAvailable, nextTask} from '../core/state.js';
 import {showMe} from './guide.js';
 
 const DESKTOP = [
-  ['explorer', 'Case Files', 'iconFolder'], ['ftk', 'FTK Imager', 'iconFtk'], ['notepad', 'Notepad++', 'iconNpp'], ['gimp', 'GIMP', 'iconGimp'],
-  ['audacity', 'Audacity', 'iconAudacity'], ['browser', 'Google Chrome', null], ['case', 'Case Record', null],
+  ['explorer', 'Case Files', null], ['ftk', 'Evidence Imager', null], ['notepad', 'Text Editor', null], ['gimp', 'Image Editor', null],
+  ['audacity', 'Audio Recorder', null], ['browser', 'Browser', null], ['case', 'Case Record', null],
 ];
 const PINNED = ['explorer', 'browser'];
 
@@ -67,11 +67,11 @@ function startMenu() {
 function quick() {
   const st = app.ui.settings;
   const slider = (key, label) => `<label><span>${label}</span><input type="range" min="0" max="1" step=".05" value="${st.volume[key]}" data-input="shell:volume" data-key="${key}" aria-label="${label} volume"></label>`;
-  return `<div class="quick" role="dialog" aria-label="Quick settings"><div class="q-row"><button class="q-tile" data-action="shell:pause">Pause simulation</button><button class="q-tile ${st.muted ? 'on' : ''}" data-action="shell:mute" aria-pressed="${st.muted}">${st.muted ? 'Sound off' : 'Sound on'}</button></div><div class="q-row"><button class="q-tile ${st.captions ? 'on' : ''}" data-action="shell:toggle" data-key="captions" aria-pressed="${st.captions}">Captions ${st.captions ? 'on' : 'off'}</button><button class="q-tile ${st.reduceMotion ? 'on' : ''}" data-action="shell:toggle" data-key="reduceMotion" aria-pressed="${st.reduceMotion}">Reduced motion</button><button class="q-tile ${st.contrast ? 'on' : ''}" data-action="shell:toggle" data-key="contrast" aria-pressed="${st.contrast}">High contrast</button></div>${slider('dialogue', 'Calls')}${slider('evidence', 'Evidence playback')}${slider('sfx', 'System sounds')}</div>`;
+  return `<div class="quick" role="dialog" aria-label="Quick settings"><div class="q-row"><button class="q-tile" data-action="shell:pause">Pause simulation</button><button class="q-tile ${st.muted ? 'on' : ''}" data-action="shell:mute" aria-pressed="${st.muted}">${st.muted ? 'Sound off' : 'Sound on'}</button></div><div class="q-row"><button class="q-tile ${st.captions ? 'on' : ''}" data-action="shell:toggle" data-key="captions" aria-pressed="${st.captions}">Captions ${st.captions ? 'on' : 'off'}</button><button class="q-tile ${st.thoughts !== false ? 'on' : ''}" data-action="shell:voice" aria-pressed="${st.thoughts !== false}">Inner voice ${st.thoughts !== false ? 'on' : 'off'}</button><button class="q-tile ${st.reduceMotion ? 'on' : ''}" data-action="shell:toggle" data-key="reduceMotion" aria-pressed="${st.reduceMotion}">Reduced motion</button><button class="q-tile ${st.contrast ? 'on' : ''}" data-action="shell:toggle" data-key="contrast" aria-pressed="${st.contrast}">High contrast</button></div>${slider('dialogue', 'Calls')}${slider('evidence', 'Evidence playback')}${slider('sfx', 'System sounds')}</div>`;
 }
 
 function toasts() {
-  return app.ui.toasts.map(t => (t.system ? `<div class="toast system" data-key="t${t.id}" role="status"><header>${icons.windows}<span>Windows</span><button data-action="toast:dismiss" data-id="${t.id}" aria-label="Dismiss notification"><i class="g-x"></i></button></header><div class="toast-body"><div><strong>${esc(t.title)}</strong><p>${esc(t.text)}</p></div></div></div>` : t.compact ? `<button class="toast-pill" data-key="t${t.id}" data-action="toast:open" aria-label="New message from Amina. Open chat">${picture('aminaFace', 'toast-face tiny')}<span>Amina sent a message</span></button>` : `<div class="toast" data-key="t${t.id}" role="status"><header>${icons.chat}<span>Google Chat${t.count > 1 ? ` · ${t.count} new messages` : ''}</span><button data-action="toast:dismiss" data-id="${t.id}" aria-label="Dismiss notification"><i class="g-x"></i></button></header><div class="toast-body">${picture('aminaFace', 'toast-face')}<div><strong>Amina Njoroge</strong><p>${esc(t.text)}</p></div></div><button class="btn soft" data-action="toast:open" data-id="${t.id}">Open chat</button></div>`)).join('');
+  return app.ui.toasts.map(t => (t.system ? `<div class="toast system" data-key="t${t.id}" role="status"><header>${icons.windows}<span>System</span><button data-action="toast:dismiss" data-id="${t.id}" aria-label="Dismiss notification"><i class="g-x"></i></button></header><div class="toast-body"><div><strong>${esc(t.title)}</strong><p>${esc(t.text)}</p></div></div></div>` : t.compact ? `<button class="toast-pill" data-key="t${t.id}" data-action="toast:open" aria-label="New message from Amina. Open chat">${picture('aminaFace', 'toast-face tiny')}<span>Amina sent a message</span></button>` : `<div class="toast" data-key="t${t.id}" role="status"><header>${icons.chat}<span>Team Chat${t.count > 1 ? ` · ${t.count} new messages` : ''}</span><button data-action="toast:dismiss" data-id="${t.id}" aria-label="Dismiss notification"><i class="g-x"></i></button></header><div class="toast-body">${picture('aminaFace', 'toast-face')}<div><strong>Amina Njoroge</strong><p>${esc(t.text)}</p></div></div><button class="btn soft" data-action="toast:open" data-id="${t.id}">Open chat</button></div>`)).join('');
 }
 
 // A message stays readable for a good while, then shrinks to a small pill that waits until it is opened.
@@ -160,6 +160,7 @@ app.register({
     if (!w) return launch(id);
     if (app.ui.active === id && !w.min) minimise(id); else focusWindow(id);
   },
+  'shell:voice': () => { app.ui.settings.thoughts = app.ui.settings.thoughts === false; app.persist(); app.render(); },
   'shell:toggle': el => { const k = el.dataset.key; app.ui.settings[k] = !app.ui.settings[k]; app.applySettings(); app.persist(); app.render(); },
   'shell:mute': () => { app.ui.settings.muted = !app.ui.settings.muted; app.applySettings(); app.persist(); app.render(); },
   'shell:pause': () => app.setPaused(true),

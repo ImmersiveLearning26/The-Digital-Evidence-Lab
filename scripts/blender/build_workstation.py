@@ -2,7 +2,7 @@
 # Run inside Blender. Each run starts clean, so the result is repeatable.
 import math
 import os
-import bpy
+import bpy, bmesh
 from mathutils import Euler, Matrix, Quaternion, Vector
 
 MODELS = '/Users/mosesjeremiah/digital evidence /3d models /'
@@ -730,6 +730,31 @@ def clean_drive_label():
                                 n.image = new
 
 
+def clean_brands():
+    """No real company's name or logo on the bench: textures from scripts/clean_brand_textures.py replace the
+    originals, and the headphones' raised model-name letters are removed."""
+    import re
+    folder = TEX + 'clean/'
+    for f in sorted(os.listdir(folder)):
+        name = re.sub(r'^(Image_\d+)_(\d{3})$', r'\1.\2', f[:-4])
+        old = bpy.data.images[name]
+        new = bpy.data.images.load(folder + f)
+        new.name = 'clean_' + f[:-4]
+        old.user_remap(new)
+    lo, hi = (115 / 768, 1 - 764 / 768), (455 / 768, 1 - 680 / 768)
+    for o in bpy.data.objects:
+        if o.type != 'MESH' or not o.name.startswith(('driverL_', 'driverR_')):
+            continue
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        uv = bm.loops.layers.uv.active
+        doomed = [f for f in bm.faces if all(lo[0] <= l[uv].uv.x <= hi[0] and lo[1] <= l[uv].uv.y <= hi[1] for l in f.loops)]
+        bmesh.ops.delete(bm, geom=doomed, context='FACES')
+        bm.to_mesh(o.data)
+        bm.free()
+        print('removed', len(doomed), 'letter faces from', o.name)
+
+
 def solid_materials():
     for m in bpy.data.materials:
         if m.name == 'Hit_Invisible' or not m.use_nodes:
@@ -764,6 +789,7 @@ def build():
     build_views()
     build_hits(mats)
     clean_drive_label()
+    clean_brands()
     solid_materials()
     bpy.context.scene.frame_set(0)
     bpy.context.scene.render.fps = FPS

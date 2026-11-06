@@ -1,4 +1,4 @@
-// Notepad++: a real editor over real bytes. Reading a file (interpretation) and changing its encoding
+// Text Editor: a real editor over real bytes. Reading a file (interpretation) and changing its encoding
 // (conversion) are different actions here, exactly as they are in the product.
 import {app} from '../runtime.js';
 import {emptyState, esc} from '../desktop/dom.js';
@@ -26,7 +26,7 @@ function openPath(path) {
   const reason = lockReason(app.s, 'text');
   if (reason) return app.guide(reason);
   const f = app.s.files[path];
-  if (!f?.settings?.b64) return app.guide('Notepad++ opens the text files in this case.');
+  if (!f?.settings?.b64) return app.guide('Text Editor opens the text files in this case.');
   openWindow('notepad');
   if (!app.attempt({type: 'OPEN', kind: 'text'})) return;
   const bytes = fromBase64(f.settings.b64);
@@ -65,8 +65,12 @@ function write(path) {
   const d = doc(), b64 = toBase64(bytesOf(d));
   const ok = app.attempt({type: 'SAVE_TEXT', path, b64, encoding: d.encoding === 'UTF-8-BOM' ? 'UTF-8-BOM' : d.encoding});
   if (!ok) return false;
-  d.path = path; d.b64 = b64; d.version = app.s.files[path].version; d.dirty = false; d.savedHere = true;
-  app.status('notepad', 'Saved. Close the file and reopen it to check how it reads.');
+  d.path = path; d.b64 = b64; d.version = app.s.files[path].version; d.dirty = false; d.savedHere = false;
+  // Saving reads the file straight back from disk with the current encoding, so what was stored is what is checked.
+  const decoding = d.encoding === 'UTF-8-BOM' ? 'UTF-8' : d.encoding;
+  app.attempt({type: 'TEXT_CHECK', path, version: d.version, decoding, reopened: true});
+  const back = decode(fromBase64(b64), decoding), same = [...back].filter((c, i) => c === [...TEXT][i]).length;
+  app.status('notepad', back === TEXT ? `Saved and read back as ${decoding}: all 92 characters intact.` : `Saved and read back as ${decoding}: ${same} of 92 characters match.`);
   return true;
 }
 async function saveAs() {
@@ -97,8 +101,8 @@ const menus = () => [
   ...['Language', 'Settings', 'Tools', 'Macro', 'Run', 'Plugins', 'Window', '?'].map(name => ({name, items: [{label: `${name} options`}]})),
 ];
 registerApp({
-  id: 'notepad', title: 'Notepad++', icon: icons.npp, rect: {x: .012, y: .012, w: .695, h: .97},
-  windowTitle: () => { const d = doc(); return `${d?.dirty ? '*' : ''}${d ? d.path : 'new 1'} - Notepad++`; },
+  id: 'notepad', title: 'Text Editor', icon: icons.npp, rect: {x: .012, y: .012, w: .695, h: .97},
+  windowTitle: () => { const d = doc(); return `${d?.dirty ? '*' : ''}${d ? d.path : 'new 1'} - Text Editor`; },
   mount(body) { app.ui.np ??= {wrap: true}; body.dataset.np = '1'; },
   view() {
     const d = doc(), st = n();
@@ -140,7 +144,7 @@ registerApp({
   },
 });
 
-// ---- Case record: encoding comparison. A separate training window, never a fake Notepad++ menu item.
+// ---- Case record: encoding comparison. A separate training window, never a fake Text Editor menu item.
 const REPS = [
   ['ASCII', 'ASCII (7-bit)', 'US-ASCII'], ['Latin-1', 'Latin-1 (8-bit)', 'ISO 8859-1'], ['UTF-8', 'UTF-8', 'UTF-8'], ['screenshot', 'Screenshot of the text', null],
 ];
@@ -164,7 +168,7 @@ registerCaseTab({
     const rep = t().rep, d = doc(), file = app.s.files[WITNESS_PATH_NAME];
     const saved = (file?.version ?? 1) > 1;
     const done = saved && file.settings.reopened && file.settings.decoding === 'UTF-8' && t().result?.ok;
-    if (!d && !saved) return `<div class="cr-pad"><h2>Text</h2><p class="cr-lead">Open witness_working.txt in Notepad++ to begin.</p></div>`;
+    if (!d && !saved) return `<div class="cr-pad"><h2>Text</h2><p class="cr-lead">Open witness_working.txt in Text Editor to begin.</p></div>`;
     if (done) return `<div class="cr-pad"><h2>Text</h2>${verifyResult()}<p class="cr-next">Now attach the saved file in Chat and send it to Amina.</p></div>`;
     const compare = (!saved && !d?.dirty) || t().showReps;
     if (compare) {
@@ -172,9 +176,9 @@ registerCaseTab({
       return `<div class="cr-pad"><h2>Compare encodings</h2><p class="cr-lead">An encoding maps characters to bytes, and 8 bits make a byte. ASCII has only 128 characters. Unicode covers many writing systems, and UTF-8 is a common way to store it. Choose one to preview it.</p>
       <div class="reps">${REPS.map(repRow).join('')}</div>
       ${rep ? `<div class="preview" aria-label="Preview of ${esc(rep)}">${rep === 'screenshot' ? '<canvas class="shot" width="560" height="72" aria-label="Picture of the text"></canvas>' : marked(rep)}</div><p class="d-small">${rep === 'screenshot' ? 'A picture of text cannot be searched or copied as text.' : lost.length ? `Lost, shown as ?: ${esc(lost.join(' '))}` : 'Every character is intact.'}</p>
-      ${rep === 'screenshot' ? '<button class="btn" data-action="tc:shot">Save screenshot to Working folder</button>' : '<button class="btn primary" data-action="tc:load" ' + (d ? '' : 'disabled') + '>Use this in Notepad++</button>' + (d ? '' : '<p class="d-small">Open the file in Notepad++ first.</p>')}` : ''}</div>`;
+      ${rep === 'screenshot' ? '<button class="btn" data-action="tc:shot">Save screenshot to Working folder</button>' : '<button class="btn primary" data-action="tc:load" ' + (d ? '' : 'disabled') + '>Use this in Text Editor</button>' + (d ? '' : '<p class="d-small">Open the file in Text Editor first.</p>')}` : ''}</div>`;
     }
-    const step = d?.dirty ? 'Save the file in Notepad++.' : d?.savedHere ? 'Close the file in Notepad++, then open it again, so you read what was actually saved.' : !d ? 'Open witness_working.txt in Notepad++ again.' : null;
+    const step = d?.dirty ? 'Save the file in Text Editor.' : d?.savedHere ? 'Close the file in Text Editor, then open it again, so you read what was actually saved.' : !d ? 'Open witness_working.txt in Text Editor again.' : null;
     return `<div class="cr-pad"><h2>Check the saved file</h2>${step ? `<p class="cr-next">${step}</p>` : `<p class="cr-next">If the text looks wrong, use the Encoding menu to change how it is read. Then verify it.</p><button class="btn primary" data-action="tc:verify">Verify saved file</button>`}${verifyResult()}<button class="eq-link" data-action="tc:reps">Choose a different encoding</button></div>`;
   },
   after(el) {
@@ -209,7 +213,7 @@ registerCaseTab({
     },
     'tc:verify': () => {
       const d = doc();
-      if (!d) return setResult(false, 'Nothing open', 'Open the saved file in Notepad++ first.');
+      if (!d) return setResult(false, 'Nothing open', 'Open the saved file in Text Editor first.');
       if (d.dirty) return setResult(false, 'Unsaved changes', 'Save the file first. The check reads the saved bytes.');
       if (d.savedHere) return setResult(false, 'Not reopened yet', 'Close the file and open it again, so you read what was actually saved.');
       if (app.s.files[d.path]?.version === 1) return setResult(false, 'This is the export', 'Save your own working copy first, then reopen it.');

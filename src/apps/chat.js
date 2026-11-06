@@ -2,7 +2,8 @@ import {app} from '../runtime.js';
 import {esc, storyTime} from '../desktop/dom.js';
 import {icons} from '../desktop/icons.js';
 import {picture} from '../content/media.js';
-import {registerPage} from './browser.js';
+import {morph} from '../desktop/dom.js';
+import {reflowForDock} from '../desktop/wm.js';
 import {fileDialog} from '../desktop/filedialog.js';
 import {COPY} from '../content/copy.js';
 import {formatBytes} from '../core/domain.js';
@@ -12,8 +13,8 @@ function card(m) {
   const c = m.card;
   if (!c) return '';
   if (c.type === 'bench') return `<button class="c-card" data-action="shell:equipment">${icons.bench}<span><strong>${esc(c.label)}</strong><small>Leave the computer and go to the workstation</small></span><em>Go</em></button>`;
-  if (c.type === 'drive') return `<button class="c-card" data-action="chat:drive">${icons.drive}<span><strong>${esc(c.label)}</strong><small>Folder · Google Drive</small></span></button>`;
-  if (c.type === 'meet') return `<button class="c-card" data-action="chat:meet" data-call="${c.call}">${icons.meet}<span><strong>${esc(c.label)}</strong><small>Google Meet · Ready to join</small></span><em>Join</em></button>`;
+  if (c.type === 'drive') return `<button class="c-card" data-action="chat:drive">${icons.drive}<span><strong>${esc(c.label)}</strong><small>Folder · Case Drive</small></span></button>`;
+  if (c.type === 'meet') return `<button class="c-card" data-action="chat:meet" data-call="${c.call}">${icons.meet}<span><strong>${esc(c.label)}</strong><small>Video Call · Ready to join</small></span><em>Join</em></button>`;
   if (c.type === 'record') return `<button class="c-card" data-action="chat:record" data-page="${c.page}">${icons.record}<span><strong>${esc(c.label)}</strong><small>Case processing record</small></span></button>`;
   if (c.type === 'case') return `<button class="c-card" data-action="chat:case" data-tab="${c.tab}">${icons.record}<span><strong>${esc(c.label)}</strong><small>Opens the Case Record window</small></span></button>`;
   return '';
@@ -29,33 +30,41 @@ function bubble(m, prev) {
    ${card(m)}</div></article>`;
 }
 
-registerPage({
-  id: 'chat', title: 'Google Chat', icon: icons.chat,
-  url: () => 'https://chat.google.com/dm/amina-njoroge',
-  view() {
-    const {s, ui} = app;
-    const c = ui.chat ?? {};
-    const typing = s.review || s.outbox.length;
-    return `<div class="gchat">
-    <aside class="gchat-nav"><div class="gchat-logo">${picture('chatLogo')}<span>Chat</span></div>
-     <h3>Direct messages</h3><button class="gc-dm on">${picture('aminaFace')}<span>Amina Njoroge</span></button></aside>
-    <section class="gchat-main">
-     <header class="gc-head">${picture('aminaFace')}<div><strong>Amina Njoroge</strong><small>Senior Forensic Analyst · Active</small></div></header>
-     <div class="gc-log" role="log" aria-live="polite" aria-label="Conversation with Amina">
+// Team Chat lives in a panel docked on the right of the desktop: a small tab when folded, the full height of
+// the screen when open, with the open windows moving over to make room. Nothing else covers it.
+const chevron = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3.5 10.5 8 6 12.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function thread() {
+  const {s, ui} = app;
+  const c = ui.chat ?? {};
+  const typing = s.review || s.outbox.length;
+  return `<div class="gc-log" role="log" aria-live="polite" aria-label="Conversation with Amina">
       <p class="gc-day">Today</p>
       ${s.messages.map((m, i) => bubble(m, s.messages[i - 1])).join('')}
       ${typing ? `<p class="gc-typing" role="status"><span class="dots"><i></i><i></i><i></i></span><span class="anim">Amina is typing…</span><span class="still">Reviewing…</span></p>` : ''}
      </div>
-     ${c.attachment ? `<div class="gc-chip">${icons.file}<span>${esc(c.attachment.name)} · version ${c.attachment.version}</span><button data-action="chat:drop" aria-label="Remove attachment">×</button></div>` : ''}
-     <div class="gc-compose"><button class="gc-clip" data-action="chat:attach" aria-label="Attach a saved file">${icons.clip}</button><input data-input="chat:draft" aria-label="Message Amina" placeholder="History is on" value="${esc(c.draft ?? '')}" data-key-enter="chat:send" autocomplete="off"><button class="gc-send" data-action="chat:send" aria-label="Send" ${s.review ? 'disabled' : ''}>${icons.send}</button></div>
-    </section></div>`;
-  },
-  after(el) {
-    const log = el.querySelector('.gc-log');
-    if (log && log.dataset.count !== String(app.s.messages.length + (app.s.review ? .5 : 0))) { log.dataset.count = app.s.messages.length + (app.s.review ? .5 : 0); log.scrollTop = log.scrollHeight; }
-    if (app.ui.active === 'browser' && (app.ui.unread || app.ui.toasts.some(t => !t.system))) { app.ui.unread = 0; app.ui.toasts = app.ui.toasts.filter(t => t.system); app.render(); }
-  },
-  actions: {
+     ${c.attachment ? `<div class="gc-chip">${icons.file}<span>${esc(c.attachment.name)} · version ${c.attachment.version}</span><button data-action="chat:drop" aria-label="Remove attachment"><i class="g-x"></i></button></div>` : ''}
+     <div class="gc-compose"><button class="gc-clip" data-action="chat:attach" aria-label="Attach a saved file">${icons.clip}</button><input data-input="chat:draft" aria-label="Message Amina" placeholder="Message Amina" value="${esc(c.draft ?? '')}" data-key-enter="chat:send" autocomplete="off"><button class="gc-send" data-action="chat:send" aria-label="Send" ${s.review ? 'disabled' : ''}>${icons.send}</button></div>`;
+}
+const dock = () => (app.ui.dock ??= {open: false});
+export function renderDock() {
+  const host = document.getElementById('chat-dock');
+  const {ui, s} = app;
+  host.hidden = ui.mode !== 'desktop' || !s.name;
+  if (host.hidden) return;
+  const open = dock().open;
+  document.getElementById('session').classList.toggle('dock-open', open);
+  morph(host, open
+    ? `<aside class="dock" aria-label="Team Chat"><header class="dock-head">${picture('aminaFace')}<div><strong>Amina Njoroge</strong><small>Senior Forensic Analyst · Active</small></div><button class="dock-x" data-action="dock:close" aria-label="Fold the chat away">${chevron}</button></header>${thread()}</aside>`
+    : `<button class="dock-tab" data-action="dock:open" aria-label="Open Team Chat${ui.unread ? `, ${ui.unread} new` : ''}">${picture('aminaFace')}<span>Chat</span>${ui.unread ? `<b class="badge">${ui.unread}</b>` : ''}</button>`);
+  if (!open) return;
+  const log = host.querySelector('.gc-log'), count = String(s.messages.length + (s.review ? .5 : 0));
+  if (log.dataset.count !== count) { log.dataset.count = count; log.scrollTop = log.scrollHeight; }
+  // Reading the open panel is reading the messages.
+  if (ui.unread || ui.toasts.some(t => !t.system)) { ui.unread = 0; ui.toasts = ui.toasts.filter(t => t.system); app.render(); }
+}
+app.openDock = () => { dock().open = true; reflowForDock(); app.persist(); app.render(); };
+
+app.register({
     'chat:drive': () => app.openPage('drive'),
     'chat:meet': el => app.openPage('meet', {call: el.dataset.call}),
     'chat:record': el => app.openPage(el.dataset.page),
@@ -81,6 +90,6 @@ registerPage({
       }
       app.render();
     },
-  },
-  inputs: {'chat:draft': el => { (app.ui.chat ??= {}).draft = el.value; }},
-});
+    'dock:open': () => app.openDock(),
+    'dock:close': () => { dock().open = false; app.persist(); app.render(); },
+}, {'chat:draft': el => { (app.ui.chat ??= {}).draft = el.value; }});

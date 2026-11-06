@@ -64,7 +64,7 @@ export async function sha(algorithm, bytes) {
   return hex(new Uint8Array(await crypto.subtle.digest(algorithm, bytes)));
 }
 
-// MD5 is not in Web Crypto; FTK Imager reports it, so it is computed here over the same bytes.
+// MD5 is not in Web Crypto; Evidence Imager reports it, so it is computed here over the same bytes.
 export function md5(input) {
   const K = Array.from({length: 64}, (_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 2 ** 32) >>> 0);
   const S = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21];

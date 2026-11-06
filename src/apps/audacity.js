@@ -1,4 +1,4 @@
-// Audacity: one mono track, one real capture presentation. ADC settings, 32-bit float processing and export
+// Audio Recorder: one mono track, one real capture presentation. ADC settings, 32-bit float processing and export
 // format are kept visibly separate, because confusing them is the misconception this task addresses.
 import {app} from '../runtime.js';
 import {emptyState, esc, reducedMotion} from '../desktop/dom.js';
@@ -6,9 +6,7 @@ import {icons} from '../desktop/icons.js';
 import {openWindow, registerApp} from '../desktop/wm.js';
 import {menubar} from '../desktop/menu.js';
 import {modal} from '../desktop/modal.js';
-import {FOLDERS} from '../desktop/filedialog.js';
-import {fileDialog} from '../desktop/filedialog.js';
-import {DIR, ENCODINGS, ITEM_LIMIT, QUANTISATION, SAMPLING, audioBytes, dynamicRange, formatBytes, nyquist, quantisationLevels} from '../core/domain.js';
+import {DIR, ENCODINGS, audioBytes, formatBytes, nyquist, quantisationLevels} from '../core/domain.js';
 import {lockReason} from '../core/state.js';
 import {clipFor, loadClips, peaks, playClip, stopClip} from '../core/lab.js';
 import {registerCaseTab} from './case.js';
@@ -89,30 +87,40 @@ async function play() {
 }
 function stop() { stopClip(); a().playing = null; app.render(); }
 
+const WHY = ['Lossless, so nothing heard is thrown away', 'Small enough to send within the budget', 'Matches the reference quality'];
 async function exportAudio() {
-  if (!app.s.audio.captured) return app.status('audacity', 'There is no audio to export. Capture the tape first.');
-  const state = {name: 'statement_master', format: 'FLAC', rate: 44100, bits: 16, folder: DIR.working, error: ''};
-  const ext = st => ({FLAC: 'flac', WAV: 'wav', MP3: 'mp3'}[st.format]);
+  const au = app.s.audio;
+  if (!au.captured) return app.status('audacity', 'There is no audio to export. Capture the tape first.');
   const choice = await modal({
-    title: 'Export Audio', width: 520, state,
+    title: 'Export Audio', width: 520, owner: 'audacity', state: {format: 'FLAC', why: au.rationale ?? ''},
     view: st => {
-      const bytes = audioBytes(Number(st.rate), Number(st.bits), st.format);
-      return `<label class="f-field"><span>File Name</span><input data-bind="name" value="${esc(st.name)}" spellcheck="false" data-autofocus></label>
-      <label class="f-field"><span>Folder</span><select data-bind="folder">${FOLDERS['C:\\Cases\\0417'].map(n => `<option value="C:\\Cases\\0417\\${n}" ${st.folder.endsWith(n) ? 'selected' : ''}>C:\\Cases\\0417\\${n}</option>`).join('')}</select></label>
-      <label class="f-field"><span>Format</span><select data-bind="format">${[['FLAC', 'FLAC Files'], ['WAV', 'WAV (Microsoft), Signed PCM'], ['MP3', 'MP3 Files']].map(([k, t]) => `<option value="${k}" ${st.format === k ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
-      <dl class="f-dl"><dt>Channels</dt><dd>Mono</dd></dl>
-      <label class="f-field"><span>Sample Rate</span><select data-bind="rate">${[8000, 16000, 44100, 96000].map(r => `<option value="${r}" ${Number(st.rate) === r ? 'selected' : ''}>${r} Hz</option>`).join('')}</select></label>
-      ${st.format === 'MP3' ? '<dl class="f-dl"><dt>Bit Rate</dt><dd>128 kbps</dd></dl>' : `<label class="f-field"><span>Bit Depth</span><select data-bind="bits">${[16, 24].map(b => `<option value="${b}" ${Number(st.bits) === b ? 'selected' : ''}>${b}-bit</option>`).join('')}</select></label>`}
-      <p class="d-small">Size: ${st.format === 'WAV' ? '' : 'about '}${formatBytes(bytes)}${st.format === 'FLAC' ? ' (estimate: 55% of PCM)' : ''} of the 100 MB limit. Saved from a ${app.s.audio.captureRate} Hz, ${app.s.audio.captureBits}-bit capture.</p>
-      ${st.error ? `<p class="fd-error" role="alert">${esc(st.error)}</p>` : ''}<footer class="modal-foot"><button class="btn primary" data-m="ok" data-default>Export</button><button class="btn" data-m="cancel">Cancel</button></footer>`;
+      const bytes = audioBytes(au.captureRate, au.captureBits, st.format);
+      return `<h3 class="ex-h">Format</h3><div class="seg ex-seg" role="radiogroup" aria-label="Format">${[['FLAC', 'FLAC · lossless, compressed'], ['WAV', 'WAV · uncompressed'], ['MP3', 'MP3 · lossy']].map(([k, t]) => `<button role="radio" aria-checked="${st.format === k}" class="${st.format === k ? 'on' : ''}" data-m="fmt" data-f="${k}">${t}</button>`).join('')}</div>
+      <p class="ex-read">${esc(ENCODINGS[st.format]?.note ?? '')} About ${formatBytes(bytes)} for ten minutes, mono, at the ${au.captureRate / 1000} kHz, ${au.captureBits}-bit capture.</p>
+      <h3 class="ex-h">Why these settings?</h3><div class="ex-why">${WHY.map(w => `<button class="${st.why === w ? 'on' : ''}" data-m="why" data-why="${esc(w)}">${esc(w)}</button>`).join('')}</div>
+      <footer class="modal-foot"><span class="ex-to">Saves to Working › statement_master</span><button class="btn" data-m="cancel">Cancel</button><button class="btn primary" data-m="ok" data-default>Export</button></footer>`;
     },
-    actions: {ok: (el, ev, api) => { if (!api.state.name.trim()) { api.state.error = 'Enter a file name.'; api.update(); return; } api.close({...api.state}); }},
+    actions: {
+      fmt: (el, ev, api) => { api.state.format = el.dataset.f; api.update(); },
+      why: (el, ev, api) => { api.state.why = el.dataset.why; api.update(); },
+      ok: (el, ev, api) => api.close({...api.state}),
+    },
   });
   if (!choice) return;
-  const base = choice.name.trim().replace(/\.[a-z0-9]+$/i, '');
-  const path = `${choice.folder}\\${base}.${ext(choice)}`;
-  const rate = Number(choice.rate), bits = choice.format === 'MP3' ? 16 : Number(choice.bits);
-  if (app.attempt({type: 'SAVE_AUDIO', path, format: choice.format, rate, bits})) app.status('audacity', `Exported ${base}.${ext(choice)}. Check it in the Case Record, then attach it in Chat.`);
+  if (choice.why) app.dispatch({type: 'RATIONALE', kind: 'audio', text: choice.why});
+  const ext = {FLAC: 'flac', WAV: 'wav', MP3: 'mp3'}[choice.format], path = `${DIR.working}\\statement_master.${ext}`;
+  if (!app.attempt({type: 'SAVE_AUDIO', path, format: choice.format, rate: au.captureRate, bits: au.captureBits})) return;
+  // The export is read back against the capture at once.
+  app.attempt({type: 'AUDIO_CHECK', path});
+  app.status('audacity', `Exported statement_master.${ext} and checked it against the capture. Send it to Amina in the chat.`);
+}
+// Sample rate and bit depth, each with a listen button, and what the choice keeps. The tape is never played here.
+function setup(au) {
+  const opt = (key, value, label) => `<span class="au-opt"><button class="${au[key] === value ? 'on' : ''}" data-action="au:set" data-key="${key}" data-v="${value}" aria-pressed="${au[key] === value}">${label}</button><button class="au-listen" data-action="au:listen" data-key="${key}" data-v="${value}" aria-label="Listen to ${label}">▶</button></span>`;
+  const rate = au.rate ?? 44100, bits = au.bits ?? 16;
+  return `<div class="au-setup"><div><h3 class="ex-h">Sample rate</h3><div class="au-opts">${[[8000, '8 kHz'], [16000, '16 kHz'], [44100, '44.1 kHz'], [96000, '96 kHz']].map(([v, t]) => opt('rate', v, t)).join('')}</div></div>
+    <div><h3 class="ex-h">Bit depth</h3><div class="au-opts">${[[8, '8-bit'], [16, '16-bit'], [24, '24-bit']].map(([v, t]) => opt('bits', v, t)).join('')}</div></div>
+    <p class="ex-read">Captures up to ${nyquist(rate) / 1000} kHz (the buzzer reaches about 10 kHz) · ${quantisationLevels(bits).toLocaleString('en')} levels · about ${formatBytes(audioBytes(rate, bits, 'WAV'))} for ten minutes. Listening never plays the tape.</p></div>`;
 }
 const menus = () => [
   {name: 'File', items: [{label: 'Save Project', action: 'au:save-project', key: 'Ctrl+S'}, {label: 'Export Audio...', action: 'au:export', key: 'Shift+Ctrl+E'}, '-', {label: 'Exit', action: 'win:close'}]},
@@ -121,8 +129,8 @@ const menus = () => [
   ...['Tracks', 'Generate', 'Effect', 'Analyze', 'Tools', 'Help'].map(name => ({name, items: [{label: `${name} commands`}]})),
 ];
 registerApp({
-  id: 'audacity', title: 'Audacity', icon: icons.audacity, rect: {x: .012, y: .012, w: .695, h: .97},
-  windowTitle: () => (app.s.audio.captured ? 'statement_capture - Audacity' : 'Audacity'),
+  id: 'audacity', title: 'Audio Recorder', icon: icons.audacity, rect: {x: .012, y: .012, w: .695, h: .97},
+  windowTitle: () => (app.s.audio.captured ? 'statement_capture - Audio Recorder' : 'Audio Recorder'),
   view() {
     const s = app.s, st = a(), au = s.audio;
     const iface = s.hardware.interface;
@@ -130,8 +138,9 @@ registerApp({
     return `<div class="audacity">${menubar('audacity', menus())}
     <div class="au-transport" role="toolbar" aria-label="Transport"><button data-action="au:play" aria-label="Play">▶</button><button data-action="au:stop" aria-label="Stop">■</button><button class="rec ${st.recording ? 'on' : ''}" data-action="au:record" aria-label="Record">●</button><div class="au-meter" aria-hidden="true"><i style="width:${st.recording ? 62 : 0}%"></i></div></div>
     ${iface ? `<div class="au-device"><label>Recording Device <select data-input="au:device" aria-label="Recording device"><option value="" ${au.device ? '' : 'selected'}>Choose input</option><option value="mic" ${au.device === 'mic' ? 'selected' : ''}>Microphone Array (built-in)</option><option value="interface" ${au.device === 'interface' ? 'selected' : ''}>USB Audio Interface</option></select></label><label>Channels <select disabled><option>1 (Mono) Recording Channel</option></select></label><label>Project Rate <select disabled><option>${au.rate} Hz</option></select></label></div>` : ''}
+    ${iface && !au.captured && !st.recording ? setup(au) : ''}
     <div class="au-ruler" aria-hidden="true">${Array.from({length: 11}, (_, i) => `<span>${i}:00</span>`).join('')}</div>
-    <div class="au-tracks">${!au.captured && !st.recording ? `<div class="app-start dark">${iface ? emptyState('Nothing recorded yet', 'The tape can be captured here once your settings are confirmed.') : emptyState('No recording input detected', 'Audacity cannot hear the tape. Connect the audio interface at your bench.')}</div>` : ''}<div class="au-track-head"><strong>Audio Track</strong><small>Mono, ${au.captured ? au.captureRate : au.rate} Hz</small><small>32-bit float</small><small class="sep">Internal processing format, not the capture depth.</small></div><canvas data-keep id="aud-wave" role="img" aria-label="${au.captured ? 'Captured waveform, ten minutes represented' : 'Empty track'}"></canvas></div>
+    <div class="au-tracks">${!au.captured && !st.recording ? `<div class="app-start dark">${iface ? emptyState('Nothing recorded yet', 'Choose the sample rate and bit depth above, select the audio interface, then press Record.') : emptyState('No recording input detected', 'Audio Recorder cannot hear the tape. Connect the audio interface at your bench.')}</div>` : ''}<div class="au-track-head"><strong>Audio Track</strong><small>Mono, ${au.captured ? au.captureRate : au.rate} Hz</small><small>32-bit float</small><small class="sep">Internal processing format, not the capture depth.</small></div><canvas data-keep id="aud-wave" role="img" aria-label="${au.captured ? 'Captured waveform, ten minutes represented' : 'Empty track'}"></canvas></div>
     <div class="au-sel"><span>Project Rate (Hz) ${au.rate}</span><span class="au-time" id="aud-time" aria-label="Source time">${mmss(time)}</span><span>${au.captured ? 'Ten minutes of source represented. Capture took seconds here.' : st.recording ? 'Recording. Tape is playing once.' : 'Ready.'}</span></div>
     <footer class="status-bar"><span>${esc(app.ui.status.audacity ?? 'Stopped.')}</span></footer></div>`;
   },
@@ -144,6 +153,13 @@ registerApp({
   unmount() { wave = null; },
   actions: {
     'au:play': play, 'au:stop': stop, 'au:record': record, 'au:export': exportAudio,
+    'au:set': el => { app.attempt({type: 'AUDIO_SET', patch: {[el.dataset.key]: Number(el.dataset.v)}}); },
+    'au:listen': async el => {
+      const au = app.s.audio, rate = el.dataset.key === 'rate' ? Number(el.dataset.v) : au.rate ?? 44100, bits = el.dataset.key === 'bits' ? Number(el.dataset.v) : au.bits ?? 16;
+      stopClip();
+      app.dispatch({type: 'AUDIO_PREVIEW', id: `${rate}-${bits}`});
+      await playClip(clipFor(rate, bits), () => app.pump());
+    },
     'au:save-project': () => app.status('audacity', 'Project saved. A project is not an audio export: use File > Export Audio for the master.'),
   },
   inputs: {'au:device': el => { app.dispatch({type: 'AUDIO_DEVICE', device: el.value}); if (el.value === 'mic') app.status('audacity', 'The built-in microphone cannot hear the tape. Select the USB Audio Interface.'); }},
@@ -151,82 +167,12 @@ registerApp({
 function ensureOpenSoft() { if (!lockReason(app.s, 'audio') && !app.s.audio.opened) app.dispatch({type: 'OPEN', kind: 'audio'}); }
 registerOpener('audio', () => { openWindow('audacity'); app.status('audacity', 'The master is already in this project. Previews stay in the Case Record.'); });
 
-// ---- Case record: ADC comparison.
-const STEPS = ['Sampling rate', 'Quantisation', 'Encoding'];
-const c = () => (app.ui.audioCase ??= {playing: null, result: null});
-const preview = (id, label, detail) => `<button class="ab ${c().playing === id ? 'on' : ''}" data-action="ac:play" data-id="${id}" aria-pressed="${c().playing === id}"><span aria-hidden="true">${c().playing === id ? '■' : '▶'}</span><span><strong>${label}</strong><small>${detail}</small></span></button>`;
-function setting(s, key, label, options) {
-  const au = s.audio;
-  return `<label class="lab-field"><span>${label}</span><select data-input="ac:set" data-key="${key}" aria-label="${label}">${options.map(([v, t]) => `<option value="${v}" ${String(au[key]) === String(v) ? 'selected' : ''}>${t}</option>`).join('')}</select></label>`;
-}
-function findings(s) {
-  const au = s.audio, sam = SAMPLING[au.rate], q = QUANTISATION[au.bits];
-  return `<ul class="findings" aria-label="What to listen for"><li><strong>Speech:</strong> ${esc(au.bits === 8 ? q.speech : sam.speech)}</li><li><strong>Buzzer:</strong> ${esc(sam.buzzer)}</li><li><strong>Captures up to:</strong> ${nyquist(au.rate) / 1000} kHz (buzzer reaches about 10 kHz)</li><li><strong>Levels:</strong> ${quantisationLevels(au.bits).toLocaleString('en')} (about ${dynamicRange(au.bits)} dB)</li></ul><p class="d-small">${esc(au.step === 0 ? sam.note : au.step === 1 ? q.note : ENCODINGS[au.format].note)}</p>`;
-}
-function coverage(rate) {
-  const pct = v => Math.min(100, v / 24 * 100);
-  return `<div class="coverage" role="img" aria-label="Frequency coverage up to ${nyquist(rate) / 1000} kilohertz; buzzer harmonics reach 10 kilohertz"><i class="cov-band" style="width:${pct(nyquist(rate) / 1000)}%"></i><i class="cov-buzz" style="left:${pct(1)}%;width:${pct(9)}%"></i><span>0</span><span>12 kHz</span><span>24 kHz</span></div>`;
-}
-function drawSignal(cv, rate, bits) {
-  const g = cv.getContext('2d'), W = cv.width, H = cv.height;
-  g.clearRect(0, 0, W, H);
-  const sig = t => .55 * Math.sin(t * 9) + .25 * Math.sin(t * 31) + .12 * Math.sin(t * 57);
-  g.strokeStyle = '#9aa7ba'; g.lineWidth = 1.5; g.beginPath();
-  for (let x = 0; x < W; x++) { const y = H / 2 - sig(x / W * 6.3) * H * .42; x ? g.lineTo(x, y) : g.moveTo(x, y); }
-  g.stroke();
-  const n = {8000: 10, 16000: 18, 44100: 42, 96000: 70}[rate], levels = {8: 7, 16: 40, 24: 90}[bits];
-  g.strokeStyle = '#1259c3'; g.fillStyle = '#1259c3'; g.lineWidth = 1.5; g.beginPath();
-  let last = null;
-  for (let i = 0; i <= n; i++) {
-    const x = i / n * W, v = Math.round(sig(x / W * 6.3) * levels) / levels, y = H / 2 - v * H * .42;
-    if (last !== null) { g.lineTo(x, last); g.lineTo(x, y); } else g.moveTo(x, y);
-    last = y;
-    if (n < 50) g.fillRect(x - 1.5, y - 1.5, 3, 3);
-  }
-  g.stroke();
-}
+// ---- Case record: what was captured and exported.
 registerCaseTab({
   id: 'audio',
   view() {
-    const s = app.s, au = s.audio;
-    if (!au.opened) return '<div class="cr-pad"><h2>Audio</h2><p class="cr-next">Open Audacity.</p></div>';
-    if (au.captured) {
-      const exports = Object.values(s.files).filter(f => f.kind === 'audio').sort((x, y) => x.name.localeCompare(y.name));
-      const master = exports.find(f => ['FLAC', 'WAV'].includes(f.settings.format));
-      return `<div class="cr-pad"><h2>Audio</h2><p class="cr-next">${!exports.length ? 'Tape captured once. In Audacity, use File > Export Audio to save a master.' : master?.settings.checked ? 'Now attach the master in Chat and send it to Amina.' : 'Check your export against the capture.'}</p>
-      ${exports.map(f => `<div class="export-row" data-key="${esc(f.path)}"><div><strong>${esc(f.name)}</strong><small>${esc(f.settings.format)}, ${f.settings.rate} Hz, ${f.settings.bits}-bit, from a ${f.settings.captureRate} Hz, ${f.settings.captureBits}-bit capture.</small></div>${f.settings.checked ? '<span class="tag ok">✓ Checked</span>' : `<button class="btn sm" data-action="ac:check" data-path="${esc(f.path)}" aria-label="Check ${esc(f.name)}">Check</button>`}</div>`).join('')}
-      <label class="lab-field"><span>Why these settings?</span><textarea data-input="ac:why" aria-label="Why these audio settings?">${esc(au.rationale)}</textarea></label></div>`;
-    }
-    if (au.step >= 3) return `<div class="cr-pad"><h2>Ready to capture</h2><p class="cr-next">${au.device === 'interface' ? 'Press Record in Audacity. The tape plays once.' : 'In Audacity, set the Recording Device to USB Audio Interface, then press Record. The tape plays once.'}</p></div>`;
-    const bytes = audioBytes(au.rate, au.bits, au.step >= 2 ? au.format : 'WAV');
-    const bClip = clipFor(au.rate, au.bits);
-    const control = au.step === 0 ? setting(s, 'rate', 'Sampling rate', [[8000, '8 kHz'], [16000, '16 kHz'], [44100, '44.1 kHz'], [96000, '96 kHz']])
-      : au.step === 1 ? setting(s, 'bits', 'Quantisation', [[8, '8-bit'], [16, '16-bit'], [24, '24-bit']])
-      : setting(s, 'format', 'Encoding', [['MP3', 'Lossy MP3 (128 kbps)'], ['FLAC', 'Lossless FLAC'], ['WAV', 'Uncompressed WAV (PCM)']]);
-    const lead = ['Sampling measures the signal at intervals. To capture a frequency, sample at least twice as fast.', 'Quantisation maps each sample to a discrete level. More levels keep quiet sounds cleaner.', 'Encoding stores the values. Lossy formats throw information away for good.'][au.step];
-    return `<div class="cr-pad"><h2>ADC comparison</h2><ol class="stepper">${STEPS.map((t, i) => `<li class="${au.step > i ? 'done' : au.step === i ? 'on' : ''}">${au.step > i ? '✓ ' : ''}${t}</li>`).join('')}</ol>
-    <p class="cr-lead">${lead}</p>${control}
-    ${au.step < 2 ? `<div class="ab-row">${preview('reference', 'A · Reference', '44.1 kHz, 16-bit')}${preview(bClip === 'reference' ? 'reference-b' : bClip, 'B · Your setting', `${au.rate / 1000} kHz, ${au.bits}-bit`)}</div>
-    <canvas class="signal" width="320" height="86" data-rate="${au.rate}" data-bits="${au.bits}" role="img" aria-label="Sample points and quantisation steps for ${au.rate} hertz at ${au.bits} bits"></canvas>${au.step === 0 ? coverage(au.rate) : ''}` : ''}${findings(s)}
-    <dl class="f-dl"><dt>Estimated size</dt><dd>${formatBytes(bytes)} for 10 min mono${bytes > ITEM_LIMIT ? ', over the 100 MB budget' : ''}</dd></dl>
-    ${au.feedback ? `<div class="feedback warn" role="status"><strong>Amina</strong><p>${esc(au.feedback.text)}</p></div>` : ''}
-    <button class="btn primary" data-action="ac:confirm">Confirm</button><p class="d-small">Previews never play the tape.</p></div>`;
-  },
-  after(el) { const cv = el.querySelector('canvas.signal'); if (cv) drawSignal(cv, Number(cv.dataset.rate), Number(cv.dataset.bits)); },
-  actions: {
-    'ac:play': async el => {
-      const id = el.dataset.id, st = c();
-      if (st.playing === id) { stopClip(); st.playing = null; app.render(); return; }
-      st.playing = id;
-      app.dispatch({type: 'AUDIO_PREVIEW', id, detail: id});
-      await playClip(id === 'reference-b' ? 'reference' : id, () => { st.playing = null; app.pump(); app.render(); });
-    },
-    'ac:confirm': () => app.attempt({type: 'AUDIO_STEP'}),
-    'ac:check': el => app.attempt({type: 'AUDIO_CHECK', path: el.dataset.path}),
-  },
-  inputs: {
-    'ac:set': el => { const k = el.dataset.key; app.attempt({type: 'AUDIO_SET', patch: {[k]: k === 'format' ? el.value : Number(el.value)}}); },
-    'ac:why': el => app.dispatch({type: 'RATIONALE', kind: 'audio', text: el.value}),
+    const s = app.s, au = s.audio, exports = Object.values(s.files).filter(f => f.kind === 'audio');
+    const status = !au.opened ? 'Open Audio Recorder.' : !au.captured ? 'Choose the settings in Audio Recorder, then record. The tape plays once.' : !exports.length ? 'Export a master: File > Export Audio.' : 'Send the master to Amina in the chat.';
+    return `<div class="cr-pad"><h2>Audio</h2><p class="cr-next">${status}</p>${exports.map(f => `<div class="export-row" data-key="${esc(f.path)}"><div><strong>${esc(f.name)}</strong><small>${esc(f.settings.format)}, ${f.settings.rate} Hz, ${f.settings.bits}-bit</small></div>${f.settings.checked ? '<span class="tag ok">✓ Checked</span>' : ''}</div>`).join('')}</div>`;
   },
 });
-

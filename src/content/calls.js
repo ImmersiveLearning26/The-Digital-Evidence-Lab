@@ -12,10 +12,10 @@ export const CALLS = {
         lines: ['Hey! Oh good, you made it. Can you hear me okay?', "Okay, great. So, how's your morning going so far?"],
         ask: [{label: 'Good, thanks!', next: 'good'}, {label: 'A bit nervous, honestly', next: 'nervous'}],
       },
-      good: {say: "[warmly] Ah, nice, love to hear it.", lines: ['Ah, nice, love to hear it.'], next: 'who'},
+      good: {say: "[warmly] Ah, nice, love to hear it.", lines: ['Ah, nice, love to hear it.'], next: 'items'},
       nervous: {
         say: "[laughs lightly] Oh, don't worry, everybody is on their first day. You're going to be fine, I promise.",
-        lines: ["Oh, don't worry, everybody is on their first day. You're going to be fine, I promise."], next: 'who',
+        lines: ["Oh, don't worry, everybody is on their first day. You're going to be fine, I promise."], next: 'items',
       },
       who: {
         say: "So, I'm Amina. I'm the senior analyst here, and you're our new junior engineer, so... you'll be working with me on this one, okay? It's case zero four one seven, and we think it's a mobile money fraud ring.",
@@ -26,10 +26,10 @@ export const CALLS = {
         lines: ['Now, three things landed on my desk this morning.', "A text message, a photograph and, you won't believe this, an actual audio recording on tape.", 'So our job is to get all three digitised, processed and stored, without losing anything that matters.', "And we've only got a limited amount of storage, so we have to be a bit careful.", 'Does that make sense so far?'],
         ask: [{label: 'Yes, that makes sense', next: 'clear'}, {label: 'Sorry, can you say that again?', next: 'again'}],
       },
-      clear: {say: '[warmly] Perfect.', lines: ['Perfect.'], next: 'plan'},
+      clear: {say: '[warmly] Perfect.', lines: ['Perfect.'], next: 'rule'},
       again: {
         say: "Of course, no problem. Three items. Keep everything that matters, and make it all fit in the storage we've got. That's really it.",
-        lines: ['Of course, no problem. Three items.', "Keep everything that matters, and make it all fit in the storage we've got. That's really it."], next: 'plan',
+        lines: ['Of course, no problem. Three items.', "Keep everything that matters, and make it all fit in the storage we've got. That's really it."], next: 'rule',
       },
       plan: {
         say: "So here's the plan. We'll prepare the evidence, then you'll do the text, then the image, then the sound, and at the end you hand it all over to me. I'll be scoring how you handle the evidence, and your text, image and audio decisions. Not your speed, okay? So please, take your time.",
@@ -37,7 +37,7 @@ export const CALLS = {
       },
       rule: {
         say: "Oh, and one rule before you go. We always work on copies. Never the original. Yeah?",
-        lines: ['Oh, and one rule before you go.', 'We always work on copies. Never the original. Yeah?'], next: 'tape',
+        lines: ['Oh, and one rule before you go.', 'We always work on copies. Never the original. Yeah?'], next: 'bye',
       },
       tape: {
         say: "The tape is actually the most fragile one, but the deck is booked for this afternoon. So we'll start with the text and the photo, and the tape just stays sealed until then.",
@@ -59,10 +59,10 @@ export const CALLS = {
         lines: ["Hey, you! So that's the handover in. How are you feeling?"],
         ask: [{label: 'Pretty good, actually', next: 'fine'}, {label: 'That was harder than I expected', next: 'hard'}],
       },
-      fine: {say: '[warmly] Good, you should. You did really well.', lines: ['Good, you should. You did really well.'], next: 'review'},
+      fine: {say: '[warmly] Good, you should. You did really well.', lines: ['Good, you should. You did really well.'], next: 'wins'},
       hard: {
         say: "[laughs lightly] Yeah, it's meant to be. But you got through it, and that's what counts.",
-        lines: ["Yeah, it's meant to be. But you got through it, and that's what counts."], next: 'review',
+        lines: ["Yeah, it's meant to be. But you got through it, and that's what counts."], next: 'wins',
       },
       review: {
         say: "So let's look back at your decisions. It's all in your record, and if you open each card you'll see what you chose, what happened, and what the strongest path looks like.",

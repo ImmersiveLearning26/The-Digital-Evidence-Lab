@@ -11,25 +11,21 @@ const MENU = {
   audacity: ['File', 'Edit', 'Select', 'View', 'Transport', 'Tracks'],
 };
 const send = file => [
-  {launch: 'Google Chrome', say: 'Open Chrome and go to Chat'},
+  {launch: 'Browser', say: 'Open the chat on the right'},
   {press: 'Attach', at: 'bl', say: 'Click the paperclip'},
   {dialog: 'Open', rows: [file], pick: file, ok: 'Open', say: `Choose ${file}`},
   {press: 'Send', at: 'br', say: 'Press Send'},
 ];
 // A message card in Chat, and the page its button opens.
-const card = (title, button, say, opens) => [{launch: 'Google Chrome', say: 'Open Chrome and go to Chat'}, {card: title, press: button, opens, say}];
+const card = (title, button, say, opens) => [{launch: 'Browser', say: 'Open the chat on the right'}, {card: title, press: button, opens, say}];
 
 export const DEMOS = {
   message: [
     {toast: 'Amina Njoroge', press: 'Open chat', say: 'Open the notification from Amina'},
-    {app: 'Google Chat'}, {card: 'Case 0417 — Intake', press: 'Open', opens: 'Google Drive · Case 0417', say: 'Open the shared folder in her message'},
+    {app: 'Team Chat'}, {card: 'Case 0417 — Intake', press: 'Open', opens: 'Case Drive · Case 0417', say: 'Open the shared folder in her message'},
   ],
-  brief: [...card('Case 0417 briefing', 'Join', 'Click Join on her invitation', 'Google Meet'), {press: 'Join now', at: 'center', say: 'Then Join now'}],
-  closing: [...card('Case 0417 handover review', 'Join', 'Click Join on her invitation', 'Google Meet'), {press: 'Join now', at: 'center', say: 'Then Join now'}],
-  records: [
-    {launch: 'Google Chrome', say: 'In Chrome, open the Drive tab'},
-    {rows: ['Witness message — source record', 'CCTV still — source record', 'Microcassette — intake record'], picks: [0, 1, 2], say: 'Open each of the three records'},
-  ],
+  brief: [...card('Case 0417 briefing', 'Join', 'Click Join on her invitation', 'Video Call'), {press: 'Join now', at: 'center', say: 'Then Join now'}],
+  closing: [...card('Case 0417 handover review', 'Join', 'Click Join on her invitation', 'Video Call'), {press: 'Join now', at: 'center', say: 'Then Join now'}],
   intake: [
     ...card('Case record: Evidence intake', 'Open', 'Open the intake record from Amina’s message', 'Evidence intake'),
     {choose: ['Highest risk', 'Middle', 'Lowest risk'], say: 'Rank the three items, by your own judgement'},
@@ -39,7 +35,7 @@ export const DEMOS = {
   ],
   bench: [{taskbar: 'View equipment', say: 'Go to your bench: View equipment, on the taskbar'}],
   acquire: [
-    {launch: 'FTK Imager', say: 'Open FTK Imager'},
+    {launch: 'Evidence Imager', say: 'Open Evidence Imager'},
     {menu: 'File', items: MENU.ftk, say: 'Open the File menu'},
     {item: 'Create Disk Image...', items: ['Add Evidence Item...', 'Create Disk Image...', 'Export Disk Image...'], say: 'Choose Create Disk Image'},
     {dialog: 'Select Source', rows: ['Physical Drive', 'Logical Drive', 'Image File'], pick: 'Physical Drive', ok: 'Next >', say: 'Pick Physical Drive'},
@@ -48,37 +44,26 @@ export const DEMOS = {
     {check: 'Verify images after they are created', say: 'Turn on verification'},
     {press: 'Start', at: 'br', say: 'Start the image'},
   ],
-  addImage: [
-    {launch: 'FTK Imager', say: 'Open FTK Imager'},
-    {menu: 'File', items: MENU.ftk, say: 'Open the File menu'},
-    {item: 'Add Evidence Item...', items: ['Add Evidence Item...', 'Create Disk Image...', 'Export Disk Image...'], say: 'Choose Add Evidence Item'},
-    {dialog: 'Select Source', rows: ['Physical Drive', 'Logical Drive', 'Image File'], pick: 'Image File', ok: 'Next >', say: 'Pick Image File'},
-    {dialog: 'Open', rows: ['drive.E01'], pick: 'drive.E01', ok: 'Open', say: 'Choose drive.E01'},
-  ],
   export: [
-    {app: 'FTK Imager', say: 'In FTK Imager'},
-    {rows: ['[root]', '[root]/Evidence'], picks: [1], say: 'Click [root]/Evidence in the tree'},
-    {press: 'Export Files', at: 'tr', say: 'Click Export Files'},
+    {app: 'Evidence Imager', say: 'In Evidence Imager'},
+    {press: 'Export working copies', at: 'tr', say: 'Click Export working copies'},
     {dialog: 'Browse For Folder', rows: ['Working', 'Submitted', 'Reports'], pick: 'Working', ok: 'OK', say: 'Send them to the Working folder'},
   ],
   openText: [
-    {launch: 'Notepad++', say: 'Open Notepad++'},
+    {launch: 'Text Editor', say: 'Open Text Editor'},
     {menu: 'File', items: MENU.npp, say: 'Open the File menu'},
     {item: 'Open...', items: ['New', 'Open...', 'Save', 'Save As...', 'Close'], say: 'Choose Open'},
     {dialog: 'Open', rows: ['witness_working.txt'], pick: 'witness_working.txt', ok: 'Open', say: 'Pick witness_working.txt'},
   ],
   fixText: [
-    {launch: 'Case Record', say: 'Open the Case Record'},
-    {tabs: ['Case', 'Text', 'Image'], pick: 'Text', say: 'Go to the Text tab'},
-    {choose: ['Encoding'], say: 'Choose an encoding to compare, by your own judgement'},
-    {press: 'Use this in Notepad++', at: 'br', say: 'Use it in Notepad++'},
-    {app: 'Notepad++'}, {menu: 'File', items: MENU.npp, say: 'In Notepad++, open File'},
-    {item: 'Save', items: ['Open...', 'Save', 'Save As...', 'Close'], say: 'Save, then Close and Open the file again'},
-    {app: 'Case Record'}, {press: 'Verify saved file', at: 'center', say: 'Back in the Case Record, verify the saved file'},
+    {app: 'Text Editor', say: 'The text looks wrong in Text Editor'},
+    {menu: 'Encoding', items: ['File', 'Edit', 'Search', 'View', 'Encoding'], say: 'Open the Encoding menu'},
+    {choose: ['How to read the bytes'], say: 'Choose the reading you judge right'},
+    {press: 'Save', at: 'tr', say: 'Save. It reads the file back to check it'},
   ],
   sendText: send('witness_working.txt'),
   openImage: [
-    {launch: 'GIMP', say: 'Open GIMP'},
+    {launch: 'Image Editor', say: 'Open Image Editor'},
     {menu: 'File', items: MENU.gimp, say: 'Open the File menu'},
     {item: 'Open...', items: ['Open...', 'Revert', 'Export As...', 'Close'], say: 'Choose Open'},
     {dialog: 'Open Image', rows: ['cctv_working.jpg'], pick: 'cctv_working.jpg', ok: 'Open', say: 'Pick cctv_working.jpg'},
@@ -86,34 +71,28 @@ export const DEMOS = {
   pixels: [
     {launch: 'Case Record', say: 'Open the Case Record'},
     {tabs: ['Case', 'Text', 'Image'], pick: 'Image', say: 'Go to the Image tab'},
-    {rows: ['Plate background · Sample', 'Character · Sample', 'Sky · Sample'], picks: [0, 1, 2], say: 'Sample the plate, a character and the sky'},
-    {type: 'R  G  B', label: 'Match the plate colour', say: 'Type the plate’s values you read'},
-    {press: 'Match swatch', at: 'br', say: 'Match the swatch'},
+    {rows: ['Number plate · Sample'], picks: [0], say: 'Sample the number plate and read its three values'},
   ],
   imageSet: [
-    {launch: 'Case Record', say: 'In the Case Record, Image tab'},
-    {press: 'Continue', at: 'br', say: 'Work through size and print, then Continue'},
-    {app: 'GIMP'}, {menu: 'Image', items: MENU.gimp, say: 'In GIMP, open the Image menu'},
-    {item: 'Print Size...', items: ['Scale Image...', 'Print Size...'], say: 'Choose Print Size'},
-    {type: '300', label: 'Resolution (PPI)', say: 'Set the resolution the case asks for'},
-    {menu: 'File', items: MENU.gimp, say: 'Then File'},
-    {item: 'Export As...', items: ['Open...', 'Revert', 'Export As...', 'Close'], say: 'Export As, then reopen the PNG and compare'},
+    {app: 'Image Editor', say: 'In Image Editor'},
+    {menu: 'File', items: ['File', 'Edit', 'Select', 'View', 'Image'], say: 'Open the File menu'},
+    {item: 'Export As...', items: ['Open...', 'Revert', 'Export As...', 'Close'], say: 'Choose Export As'},
+    {choose: ['Size', 'Print resolution', 'Why'], say: 'Choose size, print resolution and your reason, by your own judgement'},
+    {press: 'Export', at: 'br', say: 'Export. It checks itself against the source'},
   ],
   sendImage: send('cctv_working.png'),
   capture: [
-    {launch: 'Case Record', say: 'In the Case Record, Audio tab'},
-    {rows: ['▶  A · Reference', '▶  B · Comparison'], picks: [0, 1], say: 'Play the clips and listen'},
-    {choose: ['Setting'], say: 'Choose the setting you judge right'},
-    {press: 'Confirm', at: 'br', say: 'Confirm each setting'},
-    {app: 'Audacity'}, {choose: ['Input device'], say: 'In Audacity, pick the audio interface'},
+    {app: 'Audio Recorder', say: 'In Audio Recorder'},
+    {choose: ['Sample rate', 'Bit depth'], say: 'Listen, then choose the settings you judge right'},
+    {choose: ['Input device'], say: 'Select the audio interface as the input'},
     {press: '●  Record', at: 'tr', say: 'Press Record. The tape plays once'},
   ],
   exportAudio: [
-    {launch: 'Audacity', say: 'In Audacity'},
-    {menu: 'File', items: MENU.audacity, say: 'Open the File menu'},
+    {app: 'Audio Recorder', say: 'In Audio Recorder'},
+    {menu: 'File', items: ['File', 'Edit', 'Select', 'View', 'Transport'], say: 'Open the File menu'},
     {item: 'Export Audio...', items: ['Save Project', 'Export Audio...', 'Exit'], say: 'Choose Export Audio'},
-    {press: 'Export', at: 'br', say: 'Export it'},
-    {app: 'Case Record'}, {press: 'Check', at: 'center', say: 'Check the file in the Case Record'},
+    {choose: ['Format', 'Why'], say: 'Choose the format and your reason'},
+    {press: 'Export', at: 'br', say: 'Export. It checks itself against the capture'},
   ],
   sendAudio: send('statement_master.flac'),
   handover: [

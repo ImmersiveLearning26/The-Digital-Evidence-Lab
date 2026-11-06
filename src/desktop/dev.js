@@ -11,8 +11,8 @@ import {openCase} from '../apps/case.js';
 
 const SCREENS = {
   'Equipment bench': () => app.setMode('equipment'), 'Chat': () => app.openPage('chat'), 'Shared folder': () => app.openPage('drive'), 'Evidence intake': () => app.openPage('intake'),
-  'Briefing call': () => app.openPage('meet', {call: 'briefing'}), 'FTK Imager': () => openWindow('ftk'), 'Notepad++ and encoding case': () => { openWindow('notepad'); openCase('text'); },
-  'GIMP and pixel case': () => { openWindow('gimp'); openCase('image'); }, 'Audacity and ADC case': () => { openWindow('audacity'); openCase('audio'); },
+  'Briefing call': () => app.openPage('meet', {call: 'briefing'}), 'Evidence Imager': () => openWindow('ftk'), 'Text Editor and encoding case': () => { openWindow('notepad'); openCase('text'); },
+  'Image Editor and pixel case': () => { openWindow('gimp'); openCase('image'); }, 'Audio Recorder and ADC case': () => { openWindow('audacity'); openCase('audio'); },
   'File Explorer': () => openWindow('explorer'), 'Final handover': () => app.openPage('handover'), 'Debrief': () => app.openPage('debrief'),
 };
 const FLUSH = () => { while (app.s.outbox.length) app.dispatch({type: 'DELIVER'}); };
@@ -46,11 +46,12 @@ async function seed(stage) {
   }
 }
 export function devPanel() {
-  if (!app.ui.dev) return `<button class="dev-gear" data-action="dev:toggle" aria-label="Developer controls">${icons.gear}</button>`;
+  // Hidden from learners. Add ?dev to the address to show the gear; the tests open the panel directly.
+  if (!app.ui.dev) return new URLSearchParams(location.search).has('dev') ? `<button class="dev-gear" data-action="dev:toggle" aria-label="Developer controls">${icons.gear}</button>` : '';
   const keys = Object.keys(COPY), key = app.ui.devKey ?? keys[0];
   return `<aside class="dev" aria-label="Developer controls"><header><strong>Developer controls</strong><button data-action="dev:toggle" aria-label="Close developer controls">×</button></header>
   <label>Preview a screen <select id="dev-screen">${Object.keys(SCREENS).map(k => `<option>${esc(k)}</option>`).join('')}</select></label><button class="btn" data-action="dev:screen">Preview</button><p>Previews award nothing.</p>
-  <label>Seed a stage <select id="dev-stage"><option value="ftk">Ready for FTK</option><option value="text">Ready for text</option><option value="image">Ready for image</option><option value="audio">Ready for audio</option><option value="handover">Ready for handover</option></select></label><button class="btn" data-action="dev:seed">Seed</button><p>Marks the run as developer-assisted.</p>
+  <label>Seed a stage <select id="dev-stage"><option value="ftk">Ready for imaging</option><option value="text">Ready for text</option><option value="image">Ready for image</option><option value="audio">Ready for audio</option><option value="handover">Ready for handover</option></select></label><button class="btn" data-action="dev:seed">Seed</button><p>Marks the run as developer-assisted.</p>
   <div class="row-gap"><button class="btn" data-action="dev:pause">${app.ui.paused ? 'Resume' : 'Freeze'}</button><button class="btn" data-action="dev:skip">Skip media</button><button class="btn" data-action="dev:reset">Restart</button></div>
   <label>Edit Amina's draft line <select id="dev-key" data-input="dev:key">${keys.map(k => `<option value="${k}" ${k === key ? 'selected' : ''}>${k}</option>`).join('')}</select></label><textarea id="dev-copy" aria-label="Draft text">${esc(app.s.copy[key] ?? COPY[key])}</textarea><button class="btn" data-action="dev:copy">Save draft</button>
   <details><summary>State inspector</summary><pre>${esc(JSON.stringify({...app.s, files: Object.keys(app.s.files), log: app.s.log.slice(-12)}, null, 1))}</pre></details></aside>`;

@@ -113,12 +113,12 @@ class Stage {
       const panel = [W / 2 - 150, 74, 300, 196];
       this.rect(panel, 'dm-line dm-panel', this.over, 8);
       // Six pinned tiles, the one to open always among them.
-      const tiles = ['Google Chrome', 'Case Record', 'File Explorer', 'FTK Imager', 'Notepad++', 'GIMP'];
+      const tiles = ['Browser', 'Case Record', 'File Explorer', 'Evidence Imager', 'Text Editor', 'Image Editor'];
       if (!tiles.includes(b.launch)) tiles[5] = b.launch;
       let pick;
       tiles.forEach((t, i) => {
         const spot = [panel[0] + 14 + (i % 3) * 92, panel[1] + 22 + Math.floor(i / 3) * 70, 84, 58];
-        const tile = this.button(spot, {'Google Chrome': 'Chrome', 'File Explorer': 'Explorer'}[t] ?? t, this.over);
+        const tile = this.button(spot, {'File Explorer': 'Explorer'}[t] ?? t, this.over);
         if (t === b.launch) pick = tile;
       });
       await wait(500);

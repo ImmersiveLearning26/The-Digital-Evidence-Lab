@@ -42,7 +42,7 @@ for (; clicks < 260; ) {
     const el = window.__app.guideTarget();
     if (!el) return null;
     const r = el.getBoundingClientRect();
-    return {tag: el.tagName, cls: el.className?.toString?.().slice(0, 40), action: el.dataset.action ?? el.dataset.m ?? '', part: el.dataset.part ?? el.dataset.id ?? el.dataset.kind ?? '', text: el.textContent.trim().slice(0, 40), x: r.left + r.width / 2, y: r.top + Math.min(r.height / 2, 30), reps: !!el.matches('.reps'), rank: !!el.matches('.rank-row'), radios: !!el.matches('.radios'), match: !!el.matches('.match'), ab: !!el.matches('.ab-row'), table: !!el.matches('.lab-table'), row: el.tagName === 'TR', dropdown: !!el.matches('.dropdown'), select: el.tagName === 'SELECT', input: el.tagName === 'INPUT'};
+    return {tag: el.tagName, cls: el.className?.toString?.().slice(0, 40), action: el.dataset.action ?? el.dataset.m ?? '', part: el.dataset.part ?? el.dataset.id ?? el.dataset.kind ?? '', text: el.textContent.trim().slice(0, 40), x: r.left + r.width / 2, y: r.top + Math.min(r.height / 2, 30), reps: !!el.matches('.reps'), rank: !!el.matches('.rank-row'), radios: !!el.matches('.radios'), match: !!el.matches('.match'), ab: !!el.matches('.ab-row'), table: !!el.matches('.lab-table'), row: el.tagName === 'TR', dropdown: !!el.matches('.dropdown'), exgrid: !!el.matches('.ex-grid'), exwhy: !!el.matches('.ex-why'), ausetup: !!el.matches('.au-setup'), select: el.tagName === 'SELECT', input: el.tagName === 'INPUT'};
   });
   const busy = await page.evaluate(() => window.__app.busyAudio || window.__app.s.review || window.__app.s.outbox.length || window.__app.switching || document.querySelector('.modal[aria-label="Creating Image..."]'));
   if (await page.locator('.meet-reply').count()) { await page.locator('.meet-reply').first().click(); await page.waitForTimeout(600); continue; }
@@ -73,7 +73,12 @@ for (; clicks < 260; ) {
   }
   console.log(`${String(++clicks).padStart(3)} ${(await task()).tip ?? ''} -> ${look.action || look.cls || look.tag} ${look.part} ${look.text.slice(0, 26)}`);
   if (look.reps) { await page.locator('input[value="UTF-8"]').check(); }
-  else if (look.dropdown) { await page.locator('.npp .dropdown [role="menuitem"]', {hasText: /^.?UTF-8$/}).click(); }
+  else if (look.exgrid) {
+    for (const sel of ['[data-m="dim"][data-w="4000"]', '[data-m="ppi"][data-ppi="300"]', '.ex-why button']) await page.locator(`.modal ${sel}`).first().click();
+  } else if (look.exwhy) { await page.locator('.modal .ex-why button').first().click(); }
+  else if (look.ausetup) {
+    for (const [k, v] of [['rate', 44100], ['bits', 16]]) await page.locator(`[data-action="au:set"][data-key="${k}"][data-v="${v}"]`).click();
+  } else if (look.dropdown) { await page.locator('.npp .dropdown [role="menuitem"]', {hasText: /^.?UTF-8$/}).click(); }
   else if (look.rank) { for (const [i, v] of ['audio', 'text', 'image'].entries()) await page.locator(`select[data-i="${i}"]`).selectOption(v); }
   else if (look.radios) { await page.locator('input[value="preserve"]').check(); }
   else if (look.match) {
