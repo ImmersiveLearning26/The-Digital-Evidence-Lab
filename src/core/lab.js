@@ -17,7 +17,21 @@ export function loadClips() {
   })();
   return loading;
 }
-export const clipFor = (rate, bits) => (bits === 8 ? 'q8' : rate === 8000 ? 's8' : rate === 16000 ? 's16' : 'reference');
+// Every setting the learner can hear. The rate picks the recording; 8-bit then rounds it to 256 levels, as the
+// builder does for the 44.1 kHz file. Above 44.1 kHz and 16-bit nothing more can be heard: the tape stops near
+// 10 kHz and its hiss sits far above 16-bit's smallest step, so 96 kHz and 24-bit play the reference.
+const RATE_CLIP = {8000: 's8', 16000: 's16'};
+export const clipFor = (rate, bits) => {
+  const base = RATE_CLIP[rate] ?? 'reference';
+  return bits === 8 ? (base === 'reference' ? 'q8' : `${base}-q8`) : base;
+};
+function quantised(id) {
+  const src = buffers[id.replace('-q8', '')], ctx = app.audio.ctx;
+  const out = ctx.createBuffer(1, src.length, src.sampleRate), x = src.getChannelData(0), y = out.getChannelData(0);
+  // The same rounding as the 8-bit file, read back the way the browser decodes 8-bit audio (steps of 1/128).
+  for (let i = 0; i < x.length; i++) y[i] = Math.round(Math.max(-1, Math.min(1, x[i])) * 127) / 128;
+  return (buffers[id] = out);
+}
 export function stopClip() {
   if (current) { current.onended = null; try { current.stop(); } catch { /* already stopped */ } current = null; }
   app.busyAudio = false;
@@ -28,7 +42,7 @@ export async function playClip(id, onEnd) {
   stopClip();
   const ctx = app.audio.ctx;
   const src = ctx.createBufferSource();
-  src.buffer = buffers[id];
+  src.buffer = buffers[id] ?? quantised(id);
   gainNode = ctx.createGain();
   setClipLevel();
   src.connect(gainNode).connect(app.audio.master);

@@ -7,11 +7,11 @@
  "speechSeconds": [
   [
    0.5,
-   3.0582766439909297
+   3.3283673469387756
   ],
   [
    5.25,
-   9.159614512471656
+   9.4721768707483
   ]
  ],
  "versions": {
@@ -21,19 +21,19 @@
    "buzzerMid_2to4kHz_dB": 13.297998942496758,
    "bits": 16,
    "file": "reference_44100_16.wav",
-   "noiseFloor_dBFS": -39.98760336343801
+   "noiseFloor_dBFS": -57.95047033974343
   },
   "sample_8000_16": {
    "rate": 8000,
    "buzzerUpper_6to10kHz_dB": null,
-   "buzzerMid_2to4kHz_dB": 6.010573120653776,
+   "buzzerMid_2to4kHz_dB": 6.4924297142943015,
    "bits": 16,
    "file": "sample_8000_16.wav"
   },
   "sample_16000_16": {
    "rate": 16000,
-   "buzzerUpper_6to10kHz_dB": 8.030674572956757,
-   "buzzerMid_2to4kHz_dB": 8.986148664259272,
+   "buzzerUpper_6to10kHz_dB": 8.006085701461863,
+   "buzzerMid_2to4kHz_dB": 8.96155979276515,
    "bits": 16,
    "file": "sample_16000_16.wav"
   },
@@ -43,9 +43,9 @@
    "buzzerMid_2to4kHz_dB": 13.28266669171428,
    "bits": 8,
    "file": "quantised_44100_8.wav",
-   "noiseFloor_dBFS": -39.89057612084857,
-   "speechSamplesWithin3Levels": 0.7650104826212863,
-   "errorInSpeech_dB": -22.969380542489326
+   "noiseFloor_dBFS": -67.83328078689446,
+   "speechSamplesWithin3Levels": 0.7352257267736364,
+   "errorInSpeech_dB": -23.29560424603158
   }
  }
 }

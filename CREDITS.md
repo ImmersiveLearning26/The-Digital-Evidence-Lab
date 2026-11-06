@@ -29,6 +29,6 @@ Prompt: a CCTV still from a pole-mounted street camera on a Nairobi road on a cl
 
 # Voices
 
-Amina's calls: ElevenLabs voice Yna Agalo. The learner's inner voice: ElevenLabs voice Olamide. Both generated with `eleven_v3`. Check ElevenLabs' terms for each voice before public release.
+Amina's calls: ElevenLabs voice Yna Agalo. The learner's inner voice: ElevenLabs voice Olamide. The witness on the tape: ElevenLabs voice Pastie (`assets/media/source/witness-1.wav`, `witness-2.wav`), mixed with a synthesised door buzzer and tape hiss into the sample-rate and bit-depth comparisons by `scripts/build_evidence.py audio`. All generated with `eleven_v3`. Check ElevenLabs' terms for each voice before public release.
 
 The desktop wallpaper is drawn in code for this project. The tape photograph comes from the storyboard reference, with its maker's name replaced.

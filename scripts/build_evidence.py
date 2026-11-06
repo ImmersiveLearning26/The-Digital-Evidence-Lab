@@ -10,7 +10,8 @@ Produces:
   assets/media/audio/*.wav          level-matched reference and degraded comparisons
   assets/media/audio/manifest.json  measured facts behind the comparison text
 
-The number plate is always drawn here, so its colours are exact. The speech is macOS `say`.
+The number plate is always drawn here, so its colours are exact. The witness speech is assets/media/source/witness-1.wav
+and witness-2.wav (ElevenLabs, voice Pastie, eleven_v3); without them it falls back to macOS `say`.
 Run with `image` or `audio` to rebuild one part only. The buzzer is synthesised with harmonics to 10 kHz.
 """
 import json, os, subprocess, sys, tempfile, wave
@@ -317,6 +318,18 @@ def say(text, voice='Daniel', rate=148):
             return np.frombuffer(w.readframes(w.getnframes()), 'int16').astype('float64') / 32768
 
 
+def witness(n, text):
+    """The recorded witness line if there is one, else the system voice. Either way: mono, 44.1 kHz."""
+    path = os.path.join(MEDIA, 'source', f'witness-{n}.wav')
+    if not os.path.exists(path):
+        return say(text)
+    with tempfile.TemporaryDirectory() as tmp:
+        wav_path = os.path.join(tmp, 'w.wav')
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', path, '-ac', '1', '-ar', str(SR), '-sample_fmt', 's16', wav_path], check=True)
+        with wave.open(wav_path) as w:
+            return np.frombuffer(w.readframes(w.getnframes()), 'int16').astype('float64') / 32768
+
+
 def buzzer(seconds):
     t = np.arange(int(seconds * SR)) / SR
     tone = sum(np.sin(2 * np.pi * 1000 * n * t) * (0.4 + n / 16) / n ** .5 for n in range(1, 11))
@@ -365,8 +378,8 @@ def rms(x):
 
 def build_audio():
     out = os.path.join(MEDIA, 'audio')
-    first = say('I heard the door buzzer just after nine.')
-    second = say('He told me to say nothing, and to send the money before noon.')
+    first = witness(1, 'I heard the door buzzer just after nine.')
+    second = witness(2, 'He told me to say nothing, and to send the money before noon.')
     n = 10 * SR
     speech = np.zeros(n)
     a, b = int(.5 * SR), int(5.25 * SR)
@@ -412,7 +425,8 @@ def build_audio():
         sb, se = int(3.5 * rate), int(4.7 * rate)
         return dict(rate=rate, buzzerUpper_6to10kHz_dB=band_db(x[sb:se], rate, 6000, 10000), buzzerMid_2to4kHz_dB=band_db(x[sb:se], rate, 2000, 3900))
     report = {k: {**facts(v[0], v[1]), 'bits': v[2], 'file': k + '.wav'} for k, v in versions.items()}
-    sil = (np.arange(n) > 2.6 * SR) & (np.arange(n) < 3.3 * SR)
+    # The noise floor is measured in the gap between the buzzer and the second line, where only hiss plays.
+    sil = (np.arange(n) > 4.85 * SR) & (np.arange(n) < 5.2 * SR)
     report['reference_44100_16']['noiseFloor_dBFS'] = 20 * np.log10(rms(ref[sil]))
     report['quantised_44100_8']['noiseFloor_dBFS'] = 20 * np.log10(rms(q[sil]) + 1e-9)
     # Share of quiet speech samples that fall on the three levels nearest zero at 8-bit.

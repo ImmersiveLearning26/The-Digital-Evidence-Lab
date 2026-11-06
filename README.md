@@ -35,6 +35,8 @@ Plays the whole learner path in Chromium with the 3D bench on, including wrong p
 
 **Images.** Every picture is listed in `src/content/media.js`. Change a path there to replace it. An entry with `slot: true` shows as a labelled placeholder. The CCTV still is the exception, because the image tasks measure it: replace `assets/media/source/cctv_generated.jpg` and run `python3 scripts/build_evidence.py image`, which fits the photo to the plate box, draws the plate, and re-measures the sample pixels.
 
+**The tape sample.** The Listen buttons beside each sample rate and bit depth play a 10-second excerpt of the tape: the witness (ElevenLabs voice Pastie), a door buzzer reaching about 10 kHz, and tape hiss. `python3 scripts/build_evidence.py audio` rebuilds the reference and the 8 kHz, 16 kHz and 8-bit versions from `assets/media/source/witness-*.wav` and measures each into `assets/media/audio/manifest.json`; the browser makes the low-rate 8-bit mixes from those. 96 kHz and 24-bit sound the same as 44.1 kHz and 16-bit, because the tape holds nothing they could add.
+
 **Amina's calls.** Each turn of a call is one recording in `assets/media/voice/source/`, named `<call>-<node>.mp3` after the nodes in `src/content/calls.js`. They use the ElevenLabs library voice Yna Agalo with the `eleven_v3` model, and each script line carries its delivery directions in `say`. To change a turn, replace its file and run `node scripts/build-voice.mjs`. Reply buttons are the `ask` entries. Answers are never scored.
 
 **Amina's chat lines.** All chat copy is in `src/content/copy.js`.
