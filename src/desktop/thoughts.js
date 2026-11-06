@@ -49,14 +49,17 @@ export function watchThoughts() {
 }
 
 function speak(key) {
-  const host = document.getElementById('thought'), text = subtitle(THOUGHTS[key]), rec = manifest.lines[key];
+  // A line listed in the manifest plays from there; any other is tried at its usual path, so a recording dropped
+  // into the folder plays without rebuilding the manifest. A missing file leaves the subtitle on its own.
+  const host = document.getElementById('thought'), text = subtitle(THOUGHTS[key]);
+  const file = manifest.lines[key]?.file ?? `assets/media/voice/thoughts/${key.replace(':', '-')}.mp3`;
   host.innerHTML = `<span class="th-mark" aria-hidden="true"></span><p>${esc(text)}</p>`;
   host.hidden = false;
   host.classList.remove('out');
   place(host);
   const done = () => { host.classList.add('out'); app.clock.after(400, () => { host.hidden = true; current = null; watchThoughts(); }); };
-  if (rec && !app.ui.settings.muted) {
-    const audio = new Audio(rec.file);
+  if (!app.ui.settings.muted) {
+    const audio = new Audio(file);
     audio.volume = Math.min(1, app.ui.settings.volume?.dialogue ?? 1);
     current = audio;
     audio.addEventListener('ended', () => app.clock.after(600, done), {once: true});

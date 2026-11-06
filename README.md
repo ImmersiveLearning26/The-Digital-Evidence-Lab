@@ -39,7 +39,7 @@ Plays the whole learner path in Chromium with the 3D bench on, including wrong p
 
 **Amina's chat lines.** All chat copy is in `src/content/copy.js`.
 
-**The inner voice.** The learner's own thoughts are in `src/content/thoughts.js`: one per task, a few self-corrections after a refused attempt, and a few for each milestone. Each `say` carries `eleven_v3` voice directions; the subtitle shows the words alone. Recordings go in `assets/media/voice/thoughts/<key>.mp3` (a `:` in the key becomes `-`), in the ElevenLabs voice Olamide. Run `node scripts/build-thoughts.mjs` after adding any; it lists what is still missing. A line with no recording shows as a subtitle only.
+**The inner voice.** The learner's own thoughts are in `src/content/thoughts.js`: one per task, a few self-corrections after a refused attempt, and a few for each milestone. Each `say` carries `eleven_v3` voice directions; the subtitle shows the words alone. Recordings go in `assets/media/voice/thoughts/<key>.mp3` (a `:` in the key becomes `-`), in the ElevenLabs voice Olamide. The voice brief, with every line, its file name and when it plays, is [docs/INNER_VOICE_RECORDING.md](docs/INNER_VOICE_RECORDING.md). The game plays any file it finds at those names; `node scripts/build-thoughts.mjs` refreshes the manifest and lists what is still missing. A line with no recording shows as a subtitle only.
 
 **No brands.** No real company's name or logo appears. The apps have plain names (Browser, Team Chat, Case Drive, Video Call, Evidence Imager, Text Editor, Image Editor, Audio Recorder) and original icons in `src/desktop/icons.js`, and the wallpaper is drawn for this project. Logos on the supplied models are painted out by `scripts/clean_brand_textures.py`, whose results in `assets/models/tex/clean/` the Blender build swaps in; it also removes the headphones' raised model-name letters.
 
@@ -88,7 +88,7 @@ Image storage counts width × height × 3, as the storyboard does. The actual PN
 ## Open items
 
 - **Voice:** Amina cannot say the learner's own name aloud, because the calls are prerecorded and names are typed in. Chat uses the name. Check the voice's licence terms before public release.
-- **Inner voice:** 4 of 26 lines are recorded; the ElevenLabs account ran out of credits. The rest show as subtitles until recorded (`node scripts/build-thoughts.mjs` lists them, about 1,800 characters).
+- **Inner voice:** 4 of 26 lines are recorded; the ElevenLabs account ran out of credits. The rest show as subtitles until recorded. [docs/INNER_VOICE_RECORDING.md](docs/INNER_VOICE_RECORDING.md) is the brief for recording them.
 - **Tape format:** the story calls the tape a microcassette, but the supplied recorder and cassette are full-size compact-cassette models, and a microcassette cannot play in that deck. Either the wording or the models should change.
 - **Scoring:** numeric scores stay hidden. The storyboard sets weights and grade bands but no point-level rubric, so it needs SME approval. `weightedScore()` is ready.
 - **MIVA logo:** the welcome page names MIVA Open University in text; the logo slot is still empty.
