@@ -33,6 +33,5 @@ function celebrate(label) {
   el.innerHTML = `<div class="cb-orb"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="26" pathLength="1"/><path d="M20 33l8 8 16-17" pathLength="1"/></svg>${Array.from({length: 10}, (_, i) => `<i style="--a:${i * 36}deg"></i>`).join('')}</div><p>${esc(label)}</p>`;
   host.append(el);
   app.audio.tone?.(880, .08);
-  app.think?.('yes');
   app.clock.after(reducedMotion() ? 1400 : 2100, () => { el.remove(); watchMilestones(); });
 }

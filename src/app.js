@@ -31,7 +31,7 @@ const FREE_WHEN_PAUSED = new Set(['pause:resume', 'dev:toggle', 'dev:pause', 'de
 
 app.onGuide = async text => {
   noteRefusal();
-  think('oops');
+  think('fix', text);
   const atDesk = app.ui.mode === 'desktop' && /write-blocker first|at the bench/.test(text);
   const go = await message({title: 'Case guidance', text, buttons: atDesk ? [['Go to my bench', true], ['Close', false]] : [['OK', true]]});
   if (atDesk && go) app.setMode('equipment');

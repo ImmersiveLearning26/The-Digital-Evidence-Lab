@@ -1,109 +1,537 @@
 {
  "voice": "Olamide (ElevenLabs, eleven_v3)",
  "lines": {
-  "message": {
-   "file": "assets/media/voice/thoughts/message.mp3",
-   "duration": 7.63
+  "task:message": {
+   "file": "assets/media/voice/thoughts/task-message.mp3",
+   "duration": 9.33
   },
-  "brief": {
-   "file": "assets/media/voice/thoughts/brief.mp3",
-   "duration": 5.64
+  "task:brief": {
+   "file": "assets/media/voice/thoughts/task-brief.mp3",
+   "duration": 12.04
   },
-  "intake": {
-   "file": "assets/media/voice/thoughts/intake.mp3",
-   "duration": 15.39
+  "task:intake": {
+   "file": "assets/media/voice/thoughts/task-intake.mp3",
+   "duration": 14.21
   },
-  "bench": {
-   "file": "assets/media/voice/thoughts/bench.mp3",
-   "duration": 11.47
-  },
-  "acquire": {
-   "file": "assets/media/voice/thoughts/acquire.mp3",
-   "duration": 8.2
-  },
-  "export": {
-   "file": "assets/media/voice/thoughts/export.mp3",
-   "duration": 8.67
-  },
-  "openText": {
-   "file": "assets/media/voice/thoughts/openText.mp3",
-   "duration": 3.79
-  },
-  "fixText": {
-   "file": "assets/media/voice/thoughts/fixText.mp3",
-   "duration": 10.19
-  },
-  "sendText": {
-   "file": "assets/media/voice/thoughts/sendText.mp3",
-   "duration": 7.39
-  },
-  "openImage": {
-   "file": "assets/media/voice/thoughts/openImage.mp3",
-   "duration": 5.41
-  },
-  "pixels": {
-   "file": "assets/media/voice/thoughts/pixels.mp3",
-   "duration": 9.72
-  },
-  "imageSet": {
-   "file": "assets/media/voice/thoughts/imageSet.mp3",
+  "task:bench": {
+   "file": "assets/media/voice/thoughts/task-bench.mp3",
    "duration": 12.51
   },
-  "sendImage": {
-   "file": "assets/media/voice/thoughts/sendImage.mp3",
+  "task:acquire": {
+   "file": "assets/media/voice/thoughts/task-acquire.mp3",
+   "duration": 15.39
+  },
+  "task:export": {
+   "file": "assets/media/voice/thoughts/task-export.mp3",
+   "duration": 10.68
+  },
+  "task:openText": {
+   "file": "assets/media/voice/thoughts/task-openText.mp3",
+   "duration": 17.63
+  },
+  "task:fixText": {
+   "file": "assets/media/voice/thoughts/task-fixText.mp3",
+   "duration": 16.77
+  },
+  "task:sendText": {
+   "file": "assets/media/voice/thoughts/task-sendText.mp3",
+   "duration": 9.25
+  },
+  "task:openImage": {
+   "file": "assets/media/voice/thoughts/task-openImage.mp3",
+   "duration": 12.12
+  },
+  "task:pixels": {
+   "file": "assets/media/voice/thoughts/task-pixels.mp3",
+   "duration": 10.27
+  },
+  "task:imageSet": {
+   "file": "assets/media/voice/thoughts/task-imageSet.mp3",
+   "duration": 16.77
+  },
+  "task:sendImage": {
+   "file": "assets/media/voice/thoughts/task-sendImage.mp3",
+   "duration": 8.67
+  },
+  "task:benchTape": {
+   "file": "assets/media/voice/thoughts/task-benchTape.mp3",
+   "duration": 11.15
+  },
+  "task:capture": {
+   "file": "assets/media/voice/thoughts/task-capture.mp3",
+   "duration": 12.59
+  },
+  "task:exportAudio": {
+   "file": "assets/media/voice/thoughts/task-exportAudio.mp3",
+   "duration": 9.33
+  },
+  "task:sendAudio": {
+   "file": "assets/media/voice/thoughts/task-sendAudio.mp3",
+   "duration": 6.53
+  },
+  "task:handover": {
+   "file": "assets/media/voice/thoughts/task-handover.mp3",
+   "duration": 11.73
+  },
+  "task:closing": {
+   "file": "assets/media/voice/thoughts/task-closing.mp3",
+   "duration": 7.97
+  },
+  "task:debrief": {
+   "file": "assets/media/voice/thoughts/task-debrief.mp3",
+   "duration": 4.28
+  },
+  "step:dock": {
+   "file": "assets/media/voice/thoughts/step-dock.mp3",
+   "duration": 3.79
+  },
+  "step:viewer": {
+   "file": "assets/media/voice/thoughts/step-viewer.mp3",
+   "duration": 3
+  },
+  "step:start:ftk": {
+   "file": "assets/media/voice/thoughts/step-start-ftk.mp3",
+   "duration": 5.72
+  },
+  "step:start:notepad": {
+   "file": "assets/media/voice/thoughts/step-start-notepad.mp3",
+   "duration": 4.36
+  },
+  "step:start:gimp": {
+   "file": "assets/media/voice/thoughts/step-start-gimp.mp3",
+   "duration": 4.44
+  },
+  "step:start:case": {
+   "file": "assets/media/voice/thoughts/step-start-case.mp3",
+   "duration": 4.6
+  },
+  "step:start:audacity": {
+   "file": "assets/media/voice/thoughts/step-start-audacity.mp3",
+   "duration": 1.96
+  },
+  "step:pick:ftk": {
+   "file": "assets/media/voice/thoughts/step-pick-ftk.mp3",
+   "duration": 2.51
+  },
+  "step:pick:notepad": {
+   "file": "assets/media/voice/thoughts/step-pick-notepad.mp3",
+   "duration": 3
+  },
+  "step:pick:gimp": {
+   "file": "assets/media/voice/thoughts/step-pick-gimp.mp3",
+   "duration": 1.23
+  },
+  "step:pick:case": {
+   "file": "assets/media/voice/thoughts/step-pick-case.mp3",
+   "duration": 1.49
+  },
+  "step:pick:audacity": {
+   "file": "assets/media/voice/thoughts/step-pick-audacity.mp3",
+   "duration": 3.97
+  },
+  "step:switch:gimp": {
+   "file": "assets/media/voice/thoughts/step-switch-gimp.mp3",
+   "duration": 3.71
+  },
+  "step:switch:notepad": {
+   "file": "assets/media/voice/thoughts/step-switch-notepad.mp3",
+   "duration": 3.24
+  },
+  "step:switch:ftk": {
+   "file": "assets/media/voice/thoughts/step-switch-ftk.mp3",
+   "duration": 2.43
+  },
+  "step:switch:case": {
+   "file": "assets/media/voice/thoughts/step-switch-case.mp3",
+   "duration": 3.47
+  },
+  "step:switch:audacity": {
+   "file": "assets/media/voice/thoughts/step-switch-audacity.mp3",
+   "duration": 2.59
+  },
+  "step:toast": {
+   "file": "assets/media/voice/thoughts/step-toast.mp3",
+   "duration": 3
+  },
+  "step:folder": {
+   "file": "assets/media/voice/thoughts/step-folder.mp3",
+   "duration": 8.2
+  },
+  "step:briefCard": {
+   "file": "assets/media/voice/thoughts/step-briefCard.mp3",
+   "duration": 2.77
+  },
+  "step:joinNow": {
+   "file": "assets/media/voice/thoughts/step-joinNow.mp3",
+   "duration": 4.28
+  },
+  "step:intakeCard": {
+   "file": "assets/media/voice/thoughts/step-intakeCard.mp3",
+   "duration": 3.32
+  },
+  "step:rank": {
+   "file": "assets/media/voice/thoughts/step-rank.mp3",
+   "duration": 17.63
+  },
+  "step:recordRank": {
+   "file": "assets/media/voice/thoughts/step-recordRank.mp3",
+   "duration": 2.93
+  },
+  "step:objective": {
+   "file": "assets/media/voice/thoughts/step-objective.mp3",
+   "duration": 11.81
+  },
+  "step:confirmIntake": {
+   "file": "assets/media/voice/thoughts/step-confirmIntake.mp3",
+   "duration": 1.57
+  },
+  "step:benchButton": {
+   "file": "assets/media/voice/thoughts/step-benchButton.mp3",
+   "duration": 4.36
+  },
+  "step:create": {
+   "file": "assets/media/voice/thoughts/step-create.mp3",
+   "duration": 5.15
+  },
+  "step:source": {
+   "file": "assets/media/voice/thoughts/step-source.mp3",
+   "duration": 8.52
+  },
+  "step:drive": {
+   "file": "assets/media/voice/thoughts/step-drive.mp3",
+   "duration": 12.28
+  },
+  "step:add": {
+   "file": "assets/media/voice/thoughts/step-add.mp3",
+   "duration": 6.69
+  },
+  "step:destination": {
+   "file": "assets/media/voice/thoughts/step-destination.mp3",
+   "duration": 14.45
+  },
+  "step:verify": {
+   "file": "assets/media/voice/thoughts/step-verify.mp3",
+   "duration": 9.93
+  },
+  "step:start": {
+   "file": "assets/media/voice/thoughts/step-start.mp3",
+   "duration": 8.2
+  },
+  "step:exportCopies": {
+   "file": "assets/media/voice/thoughts/step-exportCopies.mp3",
+   "duration": 5.41
+  },
+  "step:folderOk": {
+   "file": "assets/media/voice/thoughts/step-folderOk.mp3",
+   "duration": 10.84
+  },
+  "step:npOpen": {
+   "file": "assets/media/voice/thoughts/step-npOpen.mp3",
+   "duration": 2.19
+  },
+  "step:pickText": {
+   "file": "assets/media/voice/thoughts/step-pickText.mp3",
+   "duration": 6.11
+  },
+  "step:confirmOpen": {
+   "file": "assets/media/voice/thoughts/step-confirmOpen.mp3",
+   "duration": 2.04
+  },
+  "step:encoding": {
+   "file": "assets/media/voice/thoughts/step-encoding.mp3",
+   "duration": 8.91
+  },
+  "step:encodings": {
+   "file": "assets/media/voice/thoughts/step-encodings.mp3",
+   "duration": 14.11
+  },
+  "step:save": {
+   "file": "assets/media/voice/thoughts/step-save.mp3",
+   "duration": 7.16
+  },
+  "step:clip": {
+   "file": "assets/media/voice/thoughts/step-clip.mp3",
+   "duration": 3.32
+  },
+  "step:pickTextSend": {
+   "file": "assets/media/voice/thoughts/step-pickTextSend.mp3",
+   "duration": 3.4
+  },
+  "step:send": {
+   "file": "assets/media/voice/thoughts/step-send.mp3",
+   "duration": 2.19
+  },
+  "step:fileMenu": {
+   "file": "assets/media/voice/thoughts/step-fileMenu.mp3",
+   "duration": 1.8
+  },
+  "step:giOpen": {
+   "file": "assets/media/voice/thoughts/step-giOpen.mp3",
+   "duration": 0.91
+  },
+  "step:pickJpg": {
+   "file": "assets/media/voice/thoughts/step-pickJpg.mp3",
+   "duration": 5.15
+  },
+  "step:imageTab": {
+   "file": "assets/media/voice/thoughts/step-imageTab.mp3",
+   "duration": 2.12
+  },
+  "step:sample": {
+   "file": "assets/media/voice/thoughts/step-sample.mp3",
+   "duration": 8.36
+  },
+  "step:exportMenu": {
+   "file": "assets/media/voice/thoughts/step-exportMenu.mp3",
+   "duration": 2.93
+  },
+  "step:exportAs": {
+   "file": "assets/media/voice/thoughts/step-exportAs.mp3",
+   "duration": 1.49
+  },
+  "step:exportGrid": {
+   "file": "assets/media/voice/thoughts/step-exportGrid.mp3",
+   "duration": 24.69
+  },
+  "step:exportOk": {
+   "file": "assets/media/voice/thoughts/step-exportOk.mp3",
+   "duration": 4.52
+  },
+  "step:pickPng": {
+   "file": "assets/media/voice/thoughts/step-pickPng.mp3",
+   "duration": 4.83
+  },
+  "step:auSetup": {
+   "file": "assets/media/voice/thoughts/step-auSetup.mp3",
+   "duration": 12.75
+  },
+  "step:auDevice": {
+   "file": "assets/media/voice/thoughts/step-auDevice.mp3",
+   "duration": 9.56
+  },
+  "step:record": {
+   "file": "assets/media/voice/thoughts/step-record.mp3",
+   "duration": 9.8
+  },
+  "step:auExportMenu": {
+   "file": "assets/media/voice/thoughts/step-auExportMenu.mp3",
+   "duration": 2.12
+  },
+  "step:auExport": {
+   "file": "assets/media/voice/thoughts/step-auExport.mp3",
+   "duration": 1.41
+  },
+  "step:auWhy": {
+   "file": "assets/media/voice/thoughts/step-auWhy.mp3",
+   "duration": 13.79
+  },
+  "step:auOk": {
+   "file": "assets/media/voice/thoughts/step-auOk.mp3",
+   "duration": 0.91
+  },
+  "step:pickFlac": {
+   "file": "assets/media/voice/thoughts/step-pickFlac.mp3",
+   "duration": 2.85
+  },
+  "step:handoverCard": {
+   "file": "assets/media/voice/thoughts/step-handoverCard.mp3",
+   "duration": 2.85
+  },
+  "step:judgements": {
+   "file": "assets/media/voice/thoughts/step-judgements.mp3",
+   "duration": 22.52
+  },
+  "step:submit": {
+   "file": "assets/media/voice/thoughts/step-submit.mp3",
+   "duration": 3.24
+  },
+  "step:closingCard": {
+   "file": "assets/media/voice/thoughts/step-closingCard.mp3",
+   "duration": 2.77
+  },
+  "step:debriefCard": {
+   "file": "assets/media/voice/thoughts/step-debriefCard.mp3",
+   "duration": 1.49
+  },
+  "step:finish": {
+   "file": "assets/media/voice/thoughts/step-finish.mp3",
+   "duration": 2.35
+  },
+  "bench:power": {
+   "file": "assets/media/voice/thoughts/bench-power.mp3",
+   "duration": 4.28
+  },
+  "bench:blocker": {
+   "file": "assets/media/voice/thoughts/bench-blocker.mp3",
    "duration": 8.83
+  },
+  "bench:drive": {
+   "file": "assets/media/voice/thoughts/bench-drive.mp3",
+   "duration": 7.39
   },
   "bench:tape": {
    "file": "assets/media/voice/thoughts/bench-tape.mp3",
+   "duration": 5.15
+  },
+  "bench:interface": {
+   "file": "assets/media/voice/thoughts/bench-interface.mp3",
+   "duration": 5.96
+  },
+  "bench:headphones": {
+   "file": "assets/media/voice/thoughts/bench-headphones.mp3",
+   "duration": 3.63
+  },
+  "bench:use": {
+   "file": "assets/media/voice/thoughts/bench-use.mp3",
+   "duration": 3.16
+  },
+  "fix:riskTextFirst": {
+   "file": "assets/media/voice/thoughts/fix-riskTextFirst.mp3",
+   "duration": 11.39
+  },
+  "fix:riskImageMiddle": {
+   "file": "assets/media/voice/thoughts/fix-riskImageMiddle.mp3",
+   "duration": 9.56
+  },
+  "fix:riskAudioLast": {
+   "file": "assets/media/voice/thoughts/fix-riskAudioLast.mp3",
+   "duration": 7.47
+  },
+  "fix:riskImageFirst": {
+   "file": "assets/media/voice/thoughts/fix-riskImageFirst.mp3",
+   "duration": 7
+  },
+  "fix:objectiveSmall": {
+   "file": "assets/media/voice/thoughts/fix-objectiveSmall.mp3",
    "duration": 9.48
   },
-  "capture": {
-   "file": "assets/media/voice/thoughts/capture.mp3",
-   "duration": 10.03
+  "fix:objectiveEnhance": {
+   "file": "assets/media/voice/thoughts/fix-objectiveEnhance.mp3",
+   "duration": 9.33
   },
-  "exportAudio": {
-   "file": "assets/media/voice/thoughts/exportAudio.mp3",
-   "duration": 7.24
+  "fix:objectiveCommon": {
+   "file": "assets/media/voice/thoughts/fix-objectiveCommon.mp3",
+   "duration": 12.59
   },
-  "sendAudio": {
-   "file": "assets/media/voice/thoughts/sendAudio.mp3",
-   "duration": 4.91
+  "fix:objectiveWrong": {
+   "file": "assets/media/voice/thoughts/fix-objectiveWrong.mp3",
+   "duration": 7.39
   },
-  "handover": {
-   "file": "assets/media/voice/thoughts/handover.mp3",
-   "duration": 8.44
+  "fix:noBlocker": {
+   "file": "assets/media/voice/thoughts/fix-noBlocker.mp3",
+   "duration": 6.35
   },
-  "closing": {
-   "file": "assets/media/voice/thoughts/closing.mp3",
-   "duration": 2.85
+  "fix:sourceAsDestination": {
+   "file": "assets/media/voice/thoughts/fix-sourceAsDestination.mp3",
+   "duration": 5.88
   },
-  "debrief": {
-   "file": "assets/media/voice/thoughts/debrief.mp3",
-   "duration": 2.27
+  "fix:wrongSourceDrive": {
+   "file": "assets/media/voice/thoughts/fix-wrongSourceDrive.mp3",
+   "duration": 8.05
   },
-  "oops:1": {
-   "file": "assets/media/voice/thoughts/oops-1.mp3",
+  "fix:notVerified": {
+   "file": "assets/media/voice/thoughts/fix-notVerified.mp3",
+   "duration": 7.89
+  },
+  "fix:storeReadOnly": {
+   "file": "assets/media/voice/thoughts/fix-storeReadOnly.mp3",
+   "duration": 7.16
+  },
+  "fix:wrongDecoding": {
+   "file": "assets/media/voice/thoughts/fix-wrongDecoding.mp3",
+   "duration": 13.56
+  },
+  "fix:asciiLoss": {
+   "file": "assets/media/voice/thoughts/fix-asciiLoss.mp3",
+   "duration": 11.55
+  },
+  "fix:latin1Loss": {
+   "file": "assets/media/voice/thoughts/fix-latin1Loss.mp3",
+   "duration": 11.08
+  },
+  "fix:staleFile": {
+   "file": "assets/media/voice/thoughts/fix-staleFile.mp3",
+   "duration": 9.09
+  },
+  "fix:imageTooLow": {
+   "file": "assets/media/voice/thoughts/fix-imageTooLow.mp3",
+   "duration": 10.84
+  },
+  "fix:imageUpscaled": {
+   "file": "assets/media/voice/thoughts/fix-imageUpscaled.mp3",
+   "duration": 7.89
+  },
+  "fix:ppiConfused": {
+   "file": "assets/media/voice/thoughts/fix-ppiConfused.mp3",
+   "duration": 9.72
+  },
+  "fix:imageOverBudget": {
+   "file": "assets/media/voice/thoughts/fix-imageOverBudget.mp3",
+   "duration": 7
+  },
+  "fix:imageRationale": {
+   "file": "assets/media/voice/thoughts/fix-imageRationale.mp3",
+   "duration": 11.31
+  },
+  "fix:samplePlate": {
+   "file": "assets/media/voice/thoughts/fix-samplePlate.mp3",
+   "duration": 9.8
+  },
+  "fix:audio8k": {
+   "file": "assets/media/voice/thoughts/fix-audio8k.mp3",
+   "duration": 11.73
+  },
+  "fix:audio16k": {
+   "file": "assets/media/voice/thoughts/fix-audio16k.mp3",
+   "duration": 11.47
+  },
+  "fix:audio8bit": {
+   "file": "assets/media/voice/thoughts/fix-audio8bit.mp3",
+   "duration": 7.97
+  },
+  "fix:audioExcess": {
+   "file": "assets/media/voice/thoughts/fix-audioExcess.mp3",
+   "duration": 10.76
+  },
+  "fix:audioMp3": {
+   "file": "assets/media/voice/thoughts/fix-audioMp3.mp3",
+   "duration": 10.61
+  },
+  "fix:audioRationale": {
+   "file": "assets/media/voice/thoughts/fix-audioRationale.mp3",
+   "duration": 12.59
+  },
+  "fix:audioOverBudget": {
+   "file": "assets/media/voice/thoughts/fix-audioOverBudget.mp3",
+   "duration": 8.12
+  },
+  "fix:selectInterface": {
+   "file": "assets/media/voice/thoughts/fix-selectInterface.mp3",
+   "duration": 6.43
+  },
+  "fix:tapeNotReady": {
+   "file": "assets/media/voice/thoughts/fix-tapeNotReady.mp3",
+   "duration": 7.81
+  },
+  "fix:alreadyCaptured": {
+   "file": "assets/media/voice/thoughts/fix-alreadyCaptured.mp3",
+   "duration": 6.53
+  },
+  "fix:fiveJudgements": {
+   "file": "assets/media/voice/thoughts/fix-fiveJudgements.mp3",
+   "duration": 5.41
+  },
+  "fix:handoverFail": {
+   "file": "assets/media/voice/thoughts/fix-handoverFail.mp3",
+   "duration": 9.87
+  },
+  "fix:attachFirst": {
+   "file": "assets/media/voice/thoughts/fix-attachFirst.mp3",
    "duration": 4.13
   },
-  "oops:2": {
-   "file": "assets/media/voice/thoughts/oops-2.mp3",
-   "duration": 4.13
-  },
-  "oops:3": {
-   "file": "assets/media/voice/thoughts/oops-3.mp3",
-   "duration": 2.93
-  },
-  "yes:1": {
-   "file": "assets/media/voice/thoughts/yes-1.mp3",
-   "duration": 3.47
-  },
-  "yes:2": {
-   "file": "assets/media/voice/thoughts/yes-2.mp3",
-   "duration": 1.88
-  },
-  "yes:3": {
-   "file": "assets/media/voice/thoughts/yes-3.mp3",
-   "duration": 2.59
+  "fix:other": {
+   "file": "assets/media/voice/thoughts/fix-other.mp3",
+   "duration": 5.88
   }
  }
 }

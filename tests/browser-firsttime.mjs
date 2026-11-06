@@ -9,10 +9,18 @@ const page = await (await browser.newContext({viewport: {width, height}})).newPa
 page.setDefaultTimeout(20000);
 const errors = [];
 page.on('pageerror', e => errors.push(e.message));
-const watchdog = setTimeout(() => { console.error('WATCHDOG'); process.exit(2); }, 580000);
+const watchdog = setTimeout(() => { console.error("WATCHDOG"); process.exit(2); }, process.env.PACE ? 1500000 : 580000);
 const state = () => page.evaluate(() => window.__app.s);
 const task = () => page.evaluate(() => { const b = document.querySelector('.tip-text'); return {tip: b?.textContent ?? null}; });
 
+// With THOUGHTS=1, every inner-voice subtitle is logged where it appears in the run.
+if (process.env.THOUGHTS) {
+  await page.exposeFunction('logThought', t => console.log(`  thought: ${t}`));
+  await page.addInitScript(() => addEventListener('DOMContentLoaded', () => {
+    const host = document.getElementById('thought');
+    new MutationObserver(() => { if (!host.hidden && host.textContent) window.logThought(host.textContent); }).observe(host, {childList: true});
+  }));
+}
 await page.goto(URL);
 await page.waitForFunction(() => window.__app?.sceneState !== 'loading', null, {timeout: 60000});
 const bench = async () => {
@@ -67,11 +75,17 @@ for (; clicks < 260; ) {
   if (repeats >= 6 || seen[tip + key] >= 9) {
     console.log(`STUCK: the glow keeps marking ${key} at "${(await task()).tip}"`);
     console.log(await page.evaluate(() => JSON.stringify({ui: window.__app.ui.textCase, front: window.__app.ui.active, buttons: [...document.querySelectorAll('.win[data-win="case"] .btn')].map(b => { const r = b.getBoundingClientRect(), hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return {text: b.textContent, disabled: b.disabled, top: Math.round(r.top), bottom: Math.round(r.bottom), hit: hit && `${hit.tagName}.${hit.className}`}; })})));
+    if (process.env.THOUGHTS) {
+      if (!(await page.evaluate(() => window.__app.ui.start))) { await page.locator('.tb-start').click(); await page.waitForTimeout(400); }
+      console.log(await page.evaluate(() => JSON.stringify([...document.querySelectorAll('.start-grid [data-id]')].map(t => { const r = t.getBoundingClientRect(), h = document.elementFromPoint(r.left + r.width / 2, r.top + Math.min(r.height / 2, 30)); return [t.dataset.id, Math.round(r.left), Math.round(r.top), h === t || t.contains(h) ? 'ok' : `${h?.tagName}#${h?.id}.${h?.className?.baseVal ?? h?.className}`]; }))));
+    }
     await page.screenshot({path: process.env.SHOT ?? 'stuck.png'});
     process.exitCode = 1;
     break;
   }
   console.log(`${String(++clicks).padStart(3)} ${(await task()).tip ?? ''} -> ${look.action || look.cls || look.tag} ${look.part} ${look.text.slice(0, 26)}`);
+  // PACE=ms makes the robot pause before each click, as a person reading the screen does.
+  if (process.env.PACE) await page.waitForTimeout(Number(process.env.PACE));
   if (look.reps) { await page.locator('input[value="UTF-8"]').check(); }
   else if (look.exgrid) {
     for (const sel of ['[data-m="dim"][data-w="4000"]', '[data-m="ppi"][data-ppi="300"]', '.ex-why button']) await page.locator(`.modal ${sel}`).first().click();
@@ -109,6 +123,8 @@ for (; clicks < 260; ) {
     if (look.action === 'ic:next' && s.image.rationale === '') await page.waitForTimeout(10);
     await page.mouse.click(look.x, look.y);
     if (look.row) await page.waitForTimeout(150);
+    // Like a person, wait to see the Start menu open (or close) before deciding the next click.
+    if (look.action === 'shell:start-menu') await page.waitForFunction(() => !!document.querySelector('.start-menu') === !!window.__app.ui.start, null, {timeout: 5000}).catch(() => {});
   }
   // Short written reasons are the learner's own, so the robot supplies them when the box is on screen.
   for (const why of ['ic:why', 'ac:why']) { const box = page.locator(`[data-input="${why}"]`); if (await box.count() && !(await box.inputValue())) await box.fill('Keeps what the task needs inside the budget.'); }

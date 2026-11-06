@@ -141,11 +141,11 @@ function target() {
   if (step.app === 'case') step.tab = {fixText: 'text', pixels: 'image', imageSet: 'image', capture: 'audio', exportAudio: 'audio'}[task.id];
   // Controls are in priority order, so a nearer step scrolled out of sight beats a later one in view.
   for (const el of step.controls.filter(Boolean).map(pick)) {
-    if (usable(el)) return {el, skill: step.skill};
+    if (usable(el)) return {el, skill: step.skill, app: step.app};
     const pane = scrolledAway(el);
-    if (pane) return {el, skill: step.skill, pane};
+    if (pane) return {el, skill: step.skill, pane, app: step.app};
   }
-  return {el: reach(step), skill: step.skill};
+  return {el: reach(step), skill: step.skill, app: step.app};
 }
 function reveal(found) {
   // Only the pane moves: scrollIntoView would also slide the window frame inside its clipped edges.
@@ -240,6 +240,8 @@ function tick() {
   if (forced || app.clock.time - lastActive >= wait) show(reveal(found));
 }
 
+// What the learner needs next and in which app, without moving anything: the inner voice follows it.
+export const guideStep = () => target();
 // Lets the first-timer test ask what would glow right now.
 app.guideTarget = () => { const found = target(), el = found?.el ? reveal(found) : null; dodge(el); return el; };
 
