@@ -9,6 +9,74 @@
    "file": "assets/media/voice/thoughts/brief.mp3",
    "duration": 5.64
   },
+  "intake": {
+   "file": "assets/media/voice/thoughts/intake.mp3",
+   "duration": 15.39
+  },
+  "bench": {
+   "file": "assets/media/voice/thoughts/bench.mp3",
+   "duration": 11.47
+  },
+  "acquire": {
+   "file": "assets/media/voice/thoughts/acquire.mp3",
+   "duration": 8.2
+  },
+  "export": {
+   "file": "assets/media/voice/thoughts/export.mp3",
+   "duration": 8.67
+  },
+  "openText": {
+   "file": "assets/media/voice/thoughts/openText.mp3",
+   "duration": 3.79
+  },
+  "fixText": {
+   "file": "assets/media/voice/thoughts/fixText.mp3",
+   "duration": 10.19
+  },
+  "sendText": {
+   "file": "assets/media/voice/thoughts/sendText.mp3",
+   "duration": 7.39
+  },
+  "openImage": {
+   "file": "assets/media/voice/thoughts/openImage.mp3",
+   "duration": 5.41
+  },
+  "pixels": {
+   "file": "assets/media/voice/thoughts/pixels.mp3",
+   "duration": 9.72
+  },
+  "imageSet": {
+   "file": "assets/media/voice/thoughts/imageSet.mp3",
+   "duration": 12.51
+  },
+  "sendImage": {
+   "file": "assets/media/voice/thoughts/sendImage.mp3",
+   "duration": 8.83
+  },
+  "bench:tape": {
+   "file": "assets/media/voice/thoughts/bench-tape.mp3",
+   "duration": 9.48
+  },
+  "capture": {
+   "file": "assets/media/voice/thoughts/capture.mp3",
+   "duration": 10.03
+  },
+  "exportAudio": {
+   "file": "assets/media/voice/thoughts/exportAudio.mp3",
+   "duration": 7.24
+  },
+  "sendAudio": {
+   "file": "assets/media/voice/thoughts/sendAudio.mp3",
+   "duration": 4.91
+  },
+  "handover": {
+   "file": "assets/media/voice/thoughts/handover.mp3",
+   "duration": 8.44
+  },
+  "closing": {
+   "file": "assets/media/voice/thoughts/closing.mp3",
+   "duration": 2.85
+  },
   "debrief": {
    "file": "assets/media/voice/thoughts/debrief.mp3",
    "duration": 2.27
@@ -16,6 +84,26 @@
   "oops:1": {
    "file": "assets/media/voice/thoughts/oops-1.mp3",
    "duration": 4.13
+  },
+  "oops:2": {
+   "file": "assets/media/voice/thoughts/oops-2.mp3",
+   "duration": 4.13
+  },
+  "oops:3": {
+   "file": "assets/media/voice/thoughts/oops-3.mp3",
+   "duration": 2.93
+  },
+  "yes:1": {
+   "file": "assets/media/voice/thoughts/yes-1.mp3",
+   "duration": 3.47
+  },
+  "yes:2": {
+   "file": "assets/media/voice/thoughts/yes-2.mp3",
+   "duration": 1.88
+  },
+  "yes:3": {
+   "file": "assets/media/voice/thoughts/yes-3.mp3",
+   "duration": 2.59
   }
  }
 }

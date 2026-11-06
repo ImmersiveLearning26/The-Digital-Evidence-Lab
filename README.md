@@ -88,7 +88,6 @@ Image storage counts width × height × 3, as the storyboard does. The actual PN
 ## Open items
 
 - **Voice:** Amina cannot say the learner's own name aloud, because the calls are prerecorded and names are typed in. Chat uses the name. Check the voice's licence terms before public release.
-- **Inner voice:** 4 of 26 lines are recorded; the ElevenLabs account ran out of credits. The rest show as subtitles until recorded. [docs/INNER_VOICE_RECORDING.md](docs/INNER_VOICE_RECORDING.md) is the brief for recording them.
 - **Tape format:** the story calls the tape a microcassette, but the supplied recorder and cassette are full-size compact-cassette models, and a microcassette cannot play in that deck. Either the wording or the models should change.
 - **Scoring:** numeric scores stay hidden. The storyboard sets weights and grade bands but no point-level rubric, so it needs SME approval. `weightedScore()` is ready.
 - **MIVA logo:** the welcome page names MIVA Open University in text; the logo slot is still empty.

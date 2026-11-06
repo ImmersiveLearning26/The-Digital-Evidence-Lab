@@ -1,6 +1,6 @@
 # Inner voice: recording brief
 
-This is the brief for generating the learner's inner voice (for example in Lovable). There are 26 short lines. 4 are recorded; the other 22 show as subtitles only until their audio files exist.
+This is the brief for generating the learner's inner voice (for example in Lovable). There are 26 short lines. All 26 are recorded (ElevenLabs, voice Olamide, `eleven_v3`, stability 0.4), trimmed and levelled to about -20 LUFS. Use this brief to re-record or change any of them.
 
 ## What the voice is
 
@@ -9,20 +9,20 @@ The learner's own thoughts while they work: a junior digital forensics trainee o
 - **Who:** one young adult, warm and calm, natural East or West African English. The same voice for every line.
 - **How:** quiet and close, as if muttered to oneself. Unhurried. Real hesitation: the "hmm"s, "ahh"s, "okay"s and "..." pauses are part of the line and should be heard. Small relief when something works; mild self-correction when it doesn't, never frustration.
 - **Not:** announcer energy, cheerfulness, or reading aloud.
-- **Existing recordings** use the ElevenLabs voice *Olamide* with the `eleven_v3` model. If that voice is not available, pick one voice that fits the description above and **re-record all 26 lines**, including the 4 already recorded, so the learner never hears two different people.
+- **Existing recordings** use the ElevenLabs voice *Olamide* with the `eleven_v3` model. If that voice is not available, pick one voice that fits the description above and **re-record all 26 lines**, so the learner never hears two different people.
 
 ## How to deliver the files
 
 1. One MP3 per line, named exactly as in each heading below, saved in `assets/media/voice/thoughts/`. Replace any file already there.
 2. Speak **only the words of the line**. The square-bracket parts, such as `[sighs]` or `[short pause]`, are delivery directions. Use them as audio tags if the model supports them (ElevenLabs `eleven_v3` does); otherwise use the *plain words* version and let the punctuation carry the pauses. Never say a bracketed word aloud.
-3. Keep each file tight: no more than about a quarter second of silence before or after. Mono, 44.1 kHz, 128 kbps or better. Similar loudness across all files (about -16 LUFS).
+3. Keep each file tight: no more than about a quarter second of silence before or after. Mono, 44.1 kHz, 128 kbps or better. Similar loudness across all files (about -20 LUFS, a little quieter than Amina).
 4. Do not change the wording. It is matched word for word by the subtitle on screen. To change a line, change it in `src/content/thoughts.js` too.
 
 That is all that is needed: the game plays any file it finds at those names. Optionally, run `node scripts/build-thoughts.mjs` afterwards (needs Node and ffmpeg) to refresh `manifest.json` and list anything still missing.
 
 ## The lines
 
-### 1. `message.mp3` (recorded, keep or re-record)
+### 1. `message.mp3`
 
 - **When it plays:** Signed in for the first time; a message from Amina has just arrived.
 - **With directions** (models that read audio tags, such as ElevenLabs `eleven_v3`):
@@ -33,7 +33,7 @@ That is all that is needed: the game plays any file it finds at those names. Opt
 
   > Okay... first day. A message from Amina. Let me see what she sent.
 
-### 2. `brief.mp3` (recorded, keep or re-record)
+### 2. `brief.mp3`
 
 - **When it plays:** Amina has asked for a video call.
 - **With directions** (models that read audio tags, such as ElevenLabs `eleven_v3`):
@@ -231,7 +231,7 @@ That is all that is needed: the game plays any file it finds at those names. Opt
 
   > Amina wants to talk it through. Okay.
 
-### 20. `debrief.mp3` (recorded, keep or re-record)
+### 20. `debrief.mp3`
 
 - **When it plays:** About to read the feedback.
 - **With directions** (models that read audio tags, such as ElevenLabs `eleven_v3`):
@@ -242,7 +242,7 @@ That is all that is needed: the game plays any file it finds at those names. Opt
 
   > Right... let’s see how I did.
 
-### 21. `oops-1.mp3` (recorded, keep or re-record)
+### 21. `oops-1.mp3`
 
 - **When it plays:** Just after a refused attempt (one of three, chosen in turn).
 - **With directions** (models that read audio tags, such as ElevenLabs `eleven_v3`):
